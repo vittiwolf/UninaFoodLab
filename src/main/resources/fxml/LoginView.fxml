@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Circle?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unina.uninafoodlab.controller.LoginController" styleClass="login-background">
+   
+   <center>
+      <!-- Contenitore principale con effetto ombra -->
+      <VBox alignment="CENTER" maxWidth="450.0" spacing="0" styleClass="login-container">
+         <padding>
+            <Insets top="40.0" bottom="40.0" left="50.0" right="50.0" />
+         </padding>
+         
+         <!-- Header con logo e titolo -->
+         <VBox alignment="CENTER" spacing="20.0" styleClass="login-header">
+            <padding>
+               <Insets bottom="30.0" />
+            </padding>
+            
+            <!-- Icona/Logo -->
+            <StackPane styleClass="logo-container">
+               <Circle radius="35.0" styleClass="logo-circle" />
+               <Label text="🍳" styleClass="logo-emoji">
+                  <font>
+                     <Font size="32.0" />
+                  </font>
+               </Label>
+            </StackPane>
+            
+            <!-- Titolo principale -->
+            <Label text="UninaFoodLab" styleClass="main-title">
+               <font>
+                  <Font name="System Bold" size="28.0" />
+               </font>
+            </Label>
+            
+            <!-- Sottotitolo -->
+            <Label text="Sistema Gestione Corsi di Cucina" styleClass="subtitle">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+         </VBox>
+         
+         <!-- Contenitore form -->
+         <VBox spacing="20.0" styleClass="login-form">
+            <padding>
+               <Insets top="20.0" />
+            </padding>
+            
+            <!-- Messaggio di benvenuto -->
+            <Label text="Accesso Chef" styleClass="welcome-message">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            
+            <!-- Campo Username -->
+            <VBox spacing="8.0" styleClass="input-group">
+               <Label text="Username" styleClass="input-label">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Label>
+               <TextField fx:id="txtUsername" promptText="Inserisci il tuo username" styleClass="modern-text-field">
+                  <font>
+                     <Font size="14.0" />
+                  </font>
+               </TextField>
+            </VBox>
+            
+            <!-- Campo Password -->
+            <VBox spacing="8.0" styleClass="input-group">
+               <Label text="Password" styleClass="input-label">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Label>
+               <PasswordField fx:id="txtPassword" promptText="Inserisci la tua password" styleClass="modern-text-field">
+                  <font>
+                     <Font size="14.0" />
+                  </font>
+               </PasswordField>
+            </VBox>
+            
+            <!-- Contenitore per messaggio di errore -->
+            <VBox spacing="0" styleClass="error-container">
+               <Label fx:id="lblErrore" wrapText="true" styleClass="error-message" visible="false">
+                  <font>
+                     <Font size="12.0" />
+                  </font>
+               </Label>
+            </VBox>
+            
+            <!-- Progress Indicator -->
+            <StackPane styleClass="progress-container">
+               <ProgressIndicator fx:id="progressLogin" maxWidth="40.0" maxHeight="40.0" styleClass="login-progress" visible="false" />
+            </StackPane>
+            
+            <!-- Pulsante Login -->
+            <Button fx:id="btnLogin" onAction="#handleLogin" text="Accedi" defaultButton="true" 
+                    styleClass="login-button" maxWidth="Infinity">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+            
+            <!-- Pulsante Esci -->
+            <Button onAction="#handleEsci" text="Esci" cancelButton="true" 
+                    styleClass="exit-button" maxWidth="Infinity">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+         </VBox>
+         
+         <!-- Separatore -->
+         <Separator prefWidth="300.0" styleClass="login-separator">
+            <VBox.margin>
+               <Insets top="25.0" bottom="20.0" />
+            </VBox.margin>
+         </Separator>
+         
+         <!-- Sezione account di test -->
+         <VBox spacing="12.0" alignment="CENTER" styleClass="test-accounts">
+            <Label text="Account di test disponibili" styleClass="test-accounts-title">
+               <font>
+                  <Font name="System Bold" size="11.0" />
+               </font>
+            </Label>
+            
+            <VBox spacing="6.0" alignment="CENTER">
+               <Label text="👨‍🍳 chef_mario : password123" styleClass="test-account-info">
+                  <font>
+                     <Font size="10.0" />
+                  </font>
+               </Label>
+               <Label text="👩‍🍳 chef_yuki : sushi2024" styleClass="test-account-info">
+                  <font>
+                     <Font size="10.0" />
+                  </font>
+               </Label>
+            </VBox>
+         </VBox>
+      </VBox>
+   </center>
+   
+   <!-- Footer -->
+   <bottom>
+      <VBox alignment="CENTER">
+         <padding>
+            <Insets top="20.0" bottom="20.0" />
+         </padding>
+         <Label text="© 2025 UninaFoodLab - Università di Napoli" styleClass="footer-text">
+            <font>
+               <Font size="10.0" />
+            </font>
+         </Label>
+      </VBox>
+   </bottom>
+</BorderPane>

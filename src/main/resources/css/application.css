@@ -1,0 +1,838 @@
+/* Stili generali per l'applicazione UninaFoodLab */
+
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 12px;
+    -fx-background-color: #f5f5f5;
+}
+
+/* Stili per le tabelle */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+}
+
+/* SOLUZIONI PER LA SEZIONE GRIGIA NELLE TABELLE */
+
+/* 1. Rimuove il placeholder predefinito quando la tabella è vuota */
+.table-view .placeholder {
+    -fx-background-color: white;
+    -fx-text-fill: #6c757d;
+    -fx-font-style: italic;
+    -fx-font-size: 14px;
+    -fx-alignment: center;
+}
+
+/* 2. Gestisce l'area vuota sotto le righe */
+.table-view .virtual-flow .clipped-container .sheet .table-row-cell:empty {
+    -fx-background-color: white;
+}
+
+/* 3. Area di riempimento sotto le celle */
+.table-view .virtual-flow .scroll-bar:vertical {
+    -fx-background-color: white;
+}
+
+/* 4. Celle vuote */
+.table-view .table-row-cell:empty .table-cell {
+    -fx-background-color: white;
+}
+
+/* 5. Sfondo dell'area virtuale delle tabelle */
+.table-view .virtual-flow .viewport {
+    -fx-background-color: white;
+}
+
+/* 6. SOLUZIONE SEMPLICE PER LE LINEE DI GRIGLIA */
+.table-view {
+    -fx-table-cell-border-color: #e0e0e0;
+    -fx-background-color: white;
+    -fx-control-inner-background: white;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* 7. Forza il background bianco per tutte le parti della tabella */
+.table-view .virtual-flow .corner,
+.table-view .virtual-flow .scroll-bar,
+.table-view .virtual-flow .scroll-bar .track,
+.table-view .virtual-flow .scroll-bar .thumb {
+    -fx-background-color: white;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #2c5f41;
+}
+
+.table-view .column-header {
+    -fx-background-color: #2c5f41;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-cell {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1px 0;
+    -fx-background-color: white;
+}
+
+/* Aggiungi bordi verticali alle celle */
+.table-view .table-cell {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 1px 1px 0;
+    -fx-background-color: white;
+}
+
+/* Configura le linee della griglia per l'intera tabella */
+.table-view {
+    -fx-table-cell-border-color: #e0e0e0;
+    -fx-background-color: white;
+    -fx-control-inner-background: white;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-background-radius: 0;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #4a7c59;
+    -fx-text-fill: white;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #e8f5e8;
+}
+
+/* Stili per i pulsanti */
+.button {
+    -fx-background-color: #2c5f41;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 16px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #4a7c59;
+}
+
+.button:pressed {
+    -fx-background-color: #1e3f2a;
+}
+
+/* Pulsanti speciali */
+.button.success {
+    -fx-background-color: #28a745;
+}
+
+.button.success:hover {
+    -fx-background-color: #218838;
+}
+
+.button.danger {
+    -fx-background-color: #dc3545;
+}
+
+.button.danger:hover {
+    -fx-background-color: #c82333;
+}
+
+.button.warning {
+    -fx-background-color: #ffc107;
+    -fx-text-fill: black;
+}
+
+.button.warning:hover {
+    -fx-background-color: #e0a800;
+}
+
+/* Stili per i campi di input */
+.text-field, .text-area {
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 6px;
+}
+
+.text-field:focused, .text-area:focused {
+    -fx-border-color: #2c5f41;
+    -fx-border-width: 2px;
+}
+
+.combo-box {
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.combo-box:focused {
+    -fx-border-color: #2c5f41;
+    -fx-border-width: 2px;
+}
+
+.date-picker {
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.date-picker:focused {
+    -fx-border-color: #2c5f41;
+    -fx-border-width: 2px;
+}
+
+/* Stili per le etichette */
+.label {
+    -fx-text-fill: #333333;
+}
+
+.label.heading {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c5f41;
+}
+
+.label.subheading {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c5f41;
+}
+
+/* Stili per i tab */
+.tab-pane {
+    -fx-tab-min-width: 150px;
+}
+
+.tab {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
+
+.tab:selected {
+    -fx-background-color: #2c5f41;
+    -fx-text-fill: white;
+}
+
+.tab:hover {
+    -fx-background-color: #4a7c59;
+    -fx-text-fill: white;
+}
+
+/* Stili per la barra del menu */
+.menu-bar {
+    -fx-background-color: #2c5f41;
+    -fx-padding: 0;
+    -fx-spacing: 0;
+}
+
+/* Assicura che i testi dei menu non vengano tagliati */
+.menu-bar .menu {
+    -fx-min-width: 80px;
+    -fx-pref-width: -1;
+    -fx-padding: 5px 15px;
+}
+
+.menu-bar .menu .label {
+    -fx-text-fill: white;
+}
+
+.menu-bar .menu:hover {
+    -fx-background-color: #4a7c59;
+}
+
+/* Stili per i menu item */
+.menu-bar .menu-item .label {
+    -fx-text-fill: black;
+    -fx-font-size: 13px;
+    -fx-padding: 5px 10px;
+    -fx-min-width: 120px;
+    -fx-pref-width: 120px;
+}
+
+.menu-bar .menu-item:hover {
+    -fx-background-color: #e8f5e8;
+}
+
+/* Stili per il dropdown dei menu */
+.context-menu {
+    -fx-background-color: white;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0.0, 2, 2);
+    -fx-min-width: 150px;
+    -fx-pref-width: 150px;
+}
+
+.context-menu .menu-item .label {
+    -fx-text-fill: black;
+    -fx-font-size: 13px;
+    -fx-padding: 8px 15px;
+}
+
+.context-menu .menu-item:focused {
+    -fx-background-color: #e8f5e8;
+}
+
+/* Stili per la toolbar */
+.tool-bar {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 0 0 1px 0;
+}
+
+/* Stili per i split pane */
+.split-pane {
+    -fx-background-color: transparent;
+}
+
+.split-pane *.split-pane-divider {
+    -fx-background-color: #d0d0d0;
+    -fx-padding: 2px;
+}
+
+/* Stili per i pannelli */
+.scroll-pane {
+    -fx-background-color: white;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+}
+
+/* Stili per le statistiche */
+.statistics-panel {
+    -fx-background-color: white;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-padding: 15px;
+}
+
+.statistic-item {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-padding: 10px;
+}
+
+.statistic-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c5f41;
+}
+
+.statistic-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6c757d;
+}
+
+/* Stili per gli stati dei campioni */
+.stato-in-attesa {
+    -fx-background-color: #fff3cd;
+    -fx-text-fill: #856404;
+}
+
+.stato-in-analisi {
+    -fx-background-color: #cce5ff;
+    -fx-text-fill: #004085;
+}
+
+.stato-completato {
+    -fx-background-color: #d4edda;
+    -fx-text-fill: #155724;
+}
+
+.stato-scartato {
+    -fx-background-color: #f8d7da;
+    -fx-text-fill: #721c24;
+}
+
+/* Stili per gli esiti delle analisi */
+.esito-conforme {
+    -fx-background-color: #d4edda;
+    -fx-text-fill: #155724;
+    -fx-font-weight: bold;
+}
+
+.esito-non-conforme {
+    -fx-background-color: #f8d7da;
+    -fx-text-fill: #721c24;
+    -fx-font-weight: bold;
+}
+
+.esito-incerto {
+    -fx-background-color: #fff3cd;
+    -fx-text-fill: #856404;
+    -fx-font-weight: bold;
+}
+
+/* Stili per la barra di stato */
+.status-bar {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 5px 10px;
+}
+
+.status-connected {
+    -fx-text-fill: #28a745;
+    -fx-font-weight: bold;
+}
+
+.status-disconnected {
+    -fx-text-fill: #dc3545;
+    -fx-font-weight: bold;
+}
+
+/* Animazioni */
+.fade-in {
+    -fx-opacity: 0;
+}
+
+.fade-in:hover {
+    -fx-opacity: 1;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* Responsive design per schermi piccoli */
+@media screen and (max-width: 1024px) {
+    .table-view .table-column {
+        -fx-min-width: 80px;
+        -fx-pref-width: 80px;
+    }
+    
+    .button {
+        -fx-padding: 6px 12px;
+        -fx-font-size: 11px;
+    }
+}
+
+/* Stili per i grafici */
+.chart-container {
+    -fx-background-color: white;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-padding: 10px;
+}
+
+.chart-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c5f41;
+}
+
+/* Stili per i form */
+.form-container {
+    -fx-background-color: white;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-padding: 15px;
+}
+
+.form-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c5f41;
+    -fx-padding: 0 0 10px 0;
+}
+
+.required-field {
+    -fx-border-color: #dc3545;
+}
+
+.valid-field {
+    -fx-border-color: #28a745;
+}
+
+/* ==================== SOLUZIONE AGGRESSIVA SEZIONE GRIGIA - RIDIMENSIONAMENTO ==================== */
+
+/* STEP 1: Forza tutti i background delle tabelle a bianco */
+.table-view {
+    -fx-background-color: white !important;
+    -fx-control-inner-background: white !important;
+    -fx-background-insets: 0 !important;
+    -fx-padding: 0 !important;
+}
+
+/* STEP 2: Rimuove qualsiasi background dal scroll pane e dai suoi componenti */
+.table-view .scroll-pane {
+    -fx-background-color: white !important;
+    -fx-background-insets: 0 !important;
+    -fx-padding: 0 !important;
+}
+
+.table-view .scroll-pane .viewport {
+    -fx-background-color: white !important;
+}
+
+.table-view .scroll-pane .corner {
+    -fx-background-color: white !important;
+}
+
+/* STEP 3: Elimina TUTTE le aree grigie del virtual flow - CON !important */
+.table-view .virtual-flow {
+    -fx-background-color: white !important;
+    -fx-background-insets: 0 !important;
+    -fx-padding: 0 !important;
+}
+
+.table-view .virtual-flow .clipped-container {
+    -fx-background-color: white !important;
+    -fx-background-insets: 0 !important;
+}
+
+.table-view .virtual-flow .sheet {
+    -fx-background-color: white !important;
+    -fx-background-insets: 0 !important;
+}
+
+/* STEP 4: Assicura che le celle vuote siano bianche - SPECIFICO PER RIDIMENSIONAMENTO */
+.table-row-cell {
+    -fx-background-color: transparent !important;
+    -fx-background-insets: 0 !important;
+}
+
+.table-row-cell:empty {
+    -fx-background-color: white !important;
+    -fx-background-insets: 0 !important;
+}
+
+/* STEP 5: Fix specifico per l'area sotto le righe quando si ridimensiona */
+.table-view > .virtual-flow > .clipped-container > .sheet {
+    -fx-background-color: white !important;
+    -fx-background-insets: 0 !important;
+    -fx-padding: 0 !important;
+}
+
+/* STEP 6: Righe con dati - aspetto alternato migliorato */
+.table-row-cell:filled:even {
+    -fx-background-color: #f8f9fa !important;
+}
+
+.table-row-cell:filled:odd {
+    -fx-background-color: white !important;
+}
+
+.table-row-cell:filled:selected {
+    -fx-background-color: #4a7c59 !important;
+    -fx-text-fill: white !important;
+}
+
+.table-row-cell:filled:selected:even,
+.table-row-cell:filled:selected:odd {
+    -fx-background-color: #4a7c59 !important;
+}
+
+/* STEP 7: Stili per placeholder personalizzati */
+.table-view .placeholder {
+    -fx-background-color: white !important;
+}
+
+.table-view .placeholder .label {
+    -fx-text-fill: #6c757d;
+}
+
+/* STEP 8: Regole SUPER aggressive per eliminare qualsiasi residuo grigio */
+.table-view .filler {
+    -fx-background-color: white !important;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #e9ecef;
+}
+
+.table-view .column-header-background .filler {
+    -fx-background-color: #e9ecef;
+}
+
+/* STEP 9: Fix specifico per il contenuto che appare durante il ridimensionamento */
+.table-view .table-column {
+    -fx-background-color: white !important;
+}
+
+.table-view .table-cell {
+    -fx-background-color: transparent !important;
+}
+
+.table-view .table-cell:empty {
+    -fx-background-color: white !important;
+}
+
+/* STEP 10: Fix per qualsiasi elemento che potrebbe apparire grigio */
+.table-view * {
+    -fx-background-color: white !important;
+}
+
+/* STEP 11: Eccezioni per mantenere i colori delle righe */
+.table-view .table-row-cell:filled:even * {
+    -fx-background-color: #f8f9fa !important;
+}
+
+.table-view .table-row-cell:filled:odd * {
+    -fx-background-color: white !important;
+}
+
+.table-view .table-row-cell:filled:selected * {
+    -fx-background-color: #4a7c59 !important;
+}
+
+/* STEP 12: Fix per header che deve rimanere grigio */
+.table-view .column-header-background,
+.table-view .column-header-background * {
+    -fx-background-color: #e9ecef !important;
+}
+
+/* ============================
+   STILI PAGINA LOGIN MODERNA 
+   ============================ */
+
+/* Sfondo principale della pagina di login */
+.login-background {
+    -fx-background-color: linear-gradient(to bottom right, #667eea, #764ba2);
+}
+
+/* Contenitore principale del form di login */
+.login-container {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 25, 0, 0, 10);
+    -fx-border-radius: 20px;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1px;
+    -fx-mouse-transparent: false;
+}
+
+/* Header della pagina di login */
+.login-header {
+    -fx-background-color: transparent;
+}
+
+/* Contenitore logo */
+.logo-container {
+    -fx-background-color: transparent;
+}
+
+.logo-circle {
+    -fx-fill: linear-gradient(to bottom right, #4facfe, #00f2fe);
+    -fx-effect: dropshadow(gaussian, rgba(79, 172, 254, 0.4), 15, 0, 0, 5);
+}
+
+.logo-emoji {
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
+}
+
+/* Titolo principale */
+.main-title {
+    -fx-text-fill: #2c3e50;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 3, 0, 0, 1);
+}
+
+/* Sottotitolo */
+.subtitle {
+    -fx-text-fill: #7f8c8d;
+    -fx-opacity: 0.8;
+}
+
+/* Form di login */
+.login-form {
+    -fx-background-color: transparent;
+}
+
+/* Messaggio di benvenuto */
+.welcome-message {
+    -fx-text-fill: #34495e;
+    -fx-alignment: center;
+}
+
+/* Gruppo di input */
+.input-group {
+    -fx-background-color: transparent;
+}
+
+/* Etichette dei campi di input */
+.input-label {
+    -fx-text-fill: #555;
+    -fx-padding: 0 5 0 5;
+}
+
+/* Campi di testo moderni */
+.modern-text-field {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 12px;
+    -fx-border-color: #e9ecef;
+    -fx-border-radius: 12px;
+    -fx-border-width: 2px;
+    -fx-padding: 12 16 12 16;
+    -fx-font-size: 14px;
+    -fx-prompt-text-fill: #adb5bd;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.05), 5, 0, 0, 1);
+    -fx-cursor: text;
+    -fx-mouse-transparent: false;
+}
+
+.modern-text-field:focused {
+    -fx-border-color: #4facfe;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(79, 172, 254, 0.3), 8, 0, 0, 0);
+}
+
+.modern-text-field:hover {
+    -fx-border-color: #ced4da;
+    -fx-background-color: white;
+}
+
+/* Contenitore errore */
+.error-container {
+    -fx-background-color: transparent;
+    -fx-min-height: 25px;
+    -fx-alignment: center;
+}
+
+/* Messaggio di errore */
+.error-message {
+    -fx-text-fill: #e74c3c;
+    -fx-background-color: rgba(231, 76, 60, 0.15);
+    -fx-background-radius: 10px;
+    -fx-padding: 12 16 12 16;
+    -fx-border-color: rgba(231, 76, 60, 0.4);
+    -fx-border-radius: 10px;
+    -fx-border-width: 2px;
+    -fx-alignment: center;
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
+    -fx-effect: dropshadow(gaussian, rgba(231, 76, 60, 0.3), 8, 0, 0, 3);
+    -fx-text-alignment: center;
+}
+
+/* Contenitore progress indicator */
+.progress-container {
+    -fx-min-height: 50px;
+    -fx-alignment: center;
+}
+
+/* Progress indicator personalizzato */
+.login-progress {
+    -fx-progress-color: #4facfe;
+}
+
+/* Pulsante di login principale */
+.login-button {
+    -fx-background-color: linear-gradient(to bottom, #4facfe, #00f2fe);
+    -fx-background-radius: 12px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 14 20 14 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(79, 172, 254, 0.4), 10, 0, 0, 5);
+    -fx-border-width: 0;
+    -fx-mouse-transparent: false;
+}
+
+.login-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #369bff, #00d4ff);
+    -fx-effect: dropshadow(gaussian, rgba(79, 172, 254, 0.6), 15, 0, 0, 8);
+    -fx-scale-y: 1.05;
+    -fx-scale-x: 1.05;
+}
+
+.login-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #2980ff, #00bbff);
+    -fx-effect: dropshadow(gaussian, rgba(79, 172, 254, 0.3), 5, 0, 0, 2);
+    -fx-scale-y: 0.98;
+    -fx-scale-x: 0.98;
+}
+
+.login-button:disabled {
+    -fx-background-color: #bdc3c7;
+    -fx-effect: none;
+    -fx-opacity: 0.7;
+}
+
+/* Pulsante di uscita */
+.exit-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #7f8c8d;
+    -fx-background-radius: 12px;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 12px;
+    -fx-border-width: 2px;
+    -fx-padding: 12 20 12 20;
+    -fx-cursor: hand;
+    -fx-mouse-transparent: false;
+}
+
+.exit-button:hover {
+    -fx-background-color: #ecf0f1;
+    -fx-text-fill: #2c3e50;
+    -fx-border-color: #95a5a6;
+}
+
+.exit-button:pressed {
+    -fx-background-color: #d5dbdb;
+    -fx-scale-y: 0.98;
+    -fx-scale-x: 0.98;
+}
+
+/* Separatore */
+.login-separator {
+    -fx-background-color: rgba(149, 165, 166, 0.3);
+}
+
+/* Sezione account di test */
+.test-accounts {
+    -fx-background-color: rgba(236, 240, 241, 0.5);
+    -fx-background-radius: 10px;
+    -fx-padding: 15 20 15 20;
+    -fx-border-color: rgba(189, 195, 199, 0.3);
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+}
+
+.test-accounts-title {
+    -fx-text-fill: #555;
+}
+
+.test-account-info {
+    -fx-text-fill: #7f8c8d;
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+}
+
+/* Testo del footer */
+.footer-text {
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0, 0, 1);
+}
+
+/* Animazioni e transizioni */
+.login-container:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 30, 0, 0, 15);
+}
+
+/* Responsive: adatta su schermi più piccoli */
+@media (max-width: 600px) {
+    .login-container {
+        -fx-max-width: 380px;
+        -fx-padding: 30 30 30 30;
+    }
+    
+    .main-title {
+        -fx-font-size: 24px;
+    }
+    
+    .modern-text-field {
+        -fx-padding: 10 14 10 14;
+    }
+}

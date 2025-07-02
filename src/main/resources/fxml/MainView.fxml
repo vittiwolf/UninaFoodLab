@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unina.uninafoodlab.controller.MainController">
+   <top>
+      <VBox>         <MenuBar>
+            <Menu text="File">
+               <MenuItem onAction="#logout" text="Logout" />
+            </Menu>
+            <Menu text="Report">
+               <MenuItem onAction="#mostraReport" text="Report Mensili" />
+            </Menu>
+         </MenuBar>
+         <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #2E86AB; -fx-padding: 10;">
+            <Label fx:id="lblBenvenuto" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" text="Benvenuto in UninaFoodLab" />
+         </HBox>
+      </VBox>
+   </top>
+   
+   <center>
+      <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
+         
+         <!-- Tab Corsi -->
+         <Tab text="Gestione Corsi">
+            <VBox spacing="10.0">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+               
+               <!-- Filtri e controlli -->
+               <HBox alignment="CENTER_LEFT" spacing="15.0">
+                  <Label text="Filtra per categoria:" />
+                  <ComboBox fx:id="cmbFiltraCategoria" onAction="#filtraPerCategoria" prefWidth="200.0" promptText="Seleziona categoria" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnNuovoCorso" onAction="#mostraNuovoCorso" style="-fx-background-color: #28A745; -fx-text-fill: white;" text="Nuovo Corso" />
+                  <Button fx:id="btnModificaCorso" onAction="#modificaCorso" text="Modifica" />
+                  <Button fx:id="btnEliminaCorso" onAction="#eliminaCorso" style="-fx-background-color: #DC3545; -fx-text-fill: white;" text="Elimina" />
+               </HBox>
+                 <!-- Tabella corsi -->
+               <TableView fx:id="tabellaCorsi" VBox.vgrow="ALWAYS">
+                  <columns>
+                     <TableColumn fx:id="colIdCorso" prefWidth="60.0" text="ID" />
+                     <TableColumn fx:id="colTitoloCorso" minWidth="200.0" prefWidth="250.0" text="Titolo" />
+                     <TableColumn fx:id="colCategoriaCorso" prefWidth="150.0" text="Categoria" />
+                     <TableColumn fx:id="colFrequenza" prefWidth="120.0" text="Frequenza" />
+                     <TableColumn fx:id="colDataInizio" prefWidth="120.0" text="Data Inizio" />
+                     <TableColumn fx:id="colStato" prefWidth="100.0" text="Stato" />
+                  </columns>
+               </TableView>
+            </VBox>
+         </Tab>
+         
+         <!-- Tab Sessioni -->
+         <Tab text="Sessioni">
+            <VBox spacing="10.0">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+               
+               <HBox alignment="CENTER_LEFT" spacing="15.0">
+                  <Label style="-fx-font-weight: bold;" text="Sessioni del corso selezionato" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnNuovaSessione" onAction="#nuovaSessione" style="-fx-background-color: #28A745; -fx-text-fill: white;" text="Nuova Sessione" />
+                  <Button fx:id="btnModificaSessione" onAction="#modificaSessione" text="Modifica" />
+                  <Button fx:id="btnAssociaRicetta" onAction="#associaRicetta" style="-fx-background-color: #FFC107; -fx-text-fill: black;" text="Associa Ricetta" />
+               </HBox>
+               
+               <TableView fx:id="tabellaSessioni" VBox.vgrow="ALWAYS">
+                  <columns>
+                     <TableColumn fx:id="colNumeroSessione" prefWidth="80.0" text="N°" />
+                     <TableColumn fx:id="colTitoloSessione" minWidth="200.0" prefWidth="250.0" text="Titolo" />
+                     <TableColumn fx:id="colDataSessione" prefWidth="120.0" text="Data" />
+                     <TableColumn fx:id="colTipoSessione" prefWidth="100.0" text="Tipo" />
+                     <TableColumn fx:id="colModalita" prefWidth="100.0" text="Modalità" />
+                     <TableColumn fx:id="colCompletata" prefWidth="100.0" text="Completata" />
+                  </columns>
+               </TableView>
+            </VBox>
+         </Tab>
+         
+         <!-- Tab Ricette -->
+         <Tab text="Ricette">
+            <VBox spacing="10.0">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+               
+               <HBox alignment="CENTER_LEFT" spacing="15.0">
+                  <Label style="-fx-font-weight: bold;" text="Gestione Ricette" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnNuovaRicetta" onAction="#nuovaRicetta" style="-fx-background-color: #28A745; -fx-text-fill: white;" text="Nuova Ricetta" />
+                  <Button fx:id="btnModificaRicetta" onAction="#modificaRicetta" text="Modifica" />
+                  <Button fx:id="btnEliminaRicetta" onAction="#eliminaRicetta" style="-fx-background-color: #DC3545; -fx-text-fill: white;" text="Elimina" />
+               </HBox>
+                 <TableView fx:id="tabellaRicette" VBox.vgrow="ALWAYS">
+                  <columns>
+                     <TableColumn fx:id="colIdRicetta" prefWidth="60.0" text="ID" />
+                     <TableColumn fx:id="colNomeRicetta" minWidth="200.0" prefWidth="250.0" text="Nome" />
+                     <TableColumn fx:id="colCategoriaRicetta" prefWidth="150.0" text="Categoria" />
+                     <TableColumn fx:id="colDifficolta" prefWidth="100.0" text="Difficoltà" />
+                     <TableColumn fx:id="colTempoPreparazione" prefWidth="120.0" text="Tempo (min)" />
+                  </columns>
+               </TableView>
+            </VBox>         </Tab>
+         
+         <!-- Tab Utenti -->
+         <Tab text="Gestione Utenti">
+            <VBox spacing="10.0">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+               
+               <!-- Controlli utenti -->
+               <HBox alignment="CENTER_LEFT" spacing="15.0">
+                  <Label style="-fx-font-weight: bold;" text="Utenti registrati" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnNuovoUtente" onAction="#nuovoUtente" style="-fx-background-color: #28A745; -fx-text-fill: white;" text="Nuovo Utente" />
+                  <Button fx:id="btnModificaUtente" onAction="#modificaUtente" text="Modifica" />
+                  <Button fx:id="btnDisattivaUtente" onAction="#disattivaUtente" style="-fx-background-color: #DC3545; -fx-text-fill: white;" text="Disattiva" />
+               </HBox>
+                 <!-- Tabella utenti -->
+               <TableView fx:id="tabellaUtenti" VBox.vgrow="ALWAYS">
+                  <columns>
+                     <TableColumn fx:id="colIdUtente" prefWidth="60.0" text="ID" />
+                     <TableColumn fx:id="colNomeUtente" prefWidth="120.0" text="Nome" />
+                     <TableColumn fx:id="colCognomeUtente" prefWidth="120.0" text="Cognome" />
+                     <TableColumn fx:id="colEmailUtente" minWidth="200.0" prefWidth="250.0" text="Email" />
+                     <TableColumn fx:id="colLivelloEsperienza" prefWidth="120.0" text="Livello" />
+                     <TableColumn fx:id="colUtenteAttivo" prefWidth="80.0" text="Attivo" />
+                  </columns>
+               </TableView>
+            </VBox>
+         </Tab>
+         
+         <!-- Tab Iscrizioni -->
+         <Tab text="Gestione Iscrizioni">
+            <VBox spacing="10.0">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+               
+               <!-- Controlli iscrizioni -->
+               <HBox alignment="CENTER_LEFT" spacing="15.0">
+                  <Label style="-fx-font-weight: bold;" text="Iscrizioni ai corsi" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnNuovaIscrizione" onAction="#nuovaIscrizione" style="-fx-background-color: #28A745; -fx-text-fill: white;" text="Nuova Iscrizione" />
+                  <Button fx:id="btnAnnullaIscrizione" onAction="#annullaIscrizione" style="-fx-background-color: #DC3545; -fx-text-fill: white;" text="Annulla Iscrizione" />
+               </HBox>
+                 <!-- Tabella iscrizioni -->
+               <TableView fx:id="tabellaIscrizioni" VBox.vgrow="ALWAYS">
+                  <columns>
+                     <TableColumn fx:id="colIdIscrizione" prefWidth="60.0" text="ID" />
+                     <TableColumn fx:id="colUtenteIscrizione" prefWidth="200.0" text="Utente" />
+                     <TableColumn fx:id="colCorsoIscrizione" minWidth="200.0" prefWidth="250.0" text="Corso" />
+                     <TableColumn fx:id="colDataIscrizione" prefWidth="150.0" text="Data Iscrizione" />
+                     <TableColumn fx:id="colStatoIscrizione" prefWidth="120.0" text="Stato" />
+                  </columns>
+               </TableView>
+            </VBox>
+         </Tab>
+  
+      </TabPane>
+   </center>
+   
+   <bottom>
+      <HBox style="-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 1 0 0 0;">
+         <children>
+            <Label text="UninaFoodLab v1.0 - Sistema di Gestione Corsi di Cucina">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="10.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </Label>
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="lblStatoConnessione" text="Database: Connesso">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unina.uninafoodlab.controller.GraficiController">
+   <top>
+      <VBox>
+         <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #2E86AB; -fx-padding: 10;">
+            <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="Report Mensili - UninaFoodLab" />
+         </HBox>
+         
+         <!-- Pannello controlli -->
+         <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-padding: 15;">
+            <Label text="Tipo Grafico:" />
+            <ComboBox fx:id="cmbTipoGrafico" prefWidth="200.0" />
+            
+            <Label text="Mese/Anno:" />
+            <ComboBox fx:id="cmbMeseAnno" prefWidth="150.0" />
+            
+            <Region HBox.hgrow="ALWAYS" />
+            <Button onAction="#esportaReport" style="-fx-background-color: #28A745; -fx-text-fill: white;" text="Esporta Report" />
+            <Button onAction="#stampaReport" text="Stampa" />
+         </HBox>
+      </VBox>
+   </top>
+   
+   <left>
+      <!-- Pannello statistiche -->
+      <VBox fx:id="statistichePanel" prefWidth="250.0" spacing="10.0" style="-fx-background-color: #F8F9FA; -fx-padding: 15;">
+         <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Statistiche Mensili" />
+         
+         <!-- Card Totale Corsi -->
+         <VBox style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+            <Label style="-fx-font-size: 12px; -fx-text-fill: #6C757D;" text="Corsi Totali" />
+            <Label fx:id="lblTotaleCorsi" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007BFF;" text="0" />
+         </VBox>
+         
+         <!-- Card Sessioni Totali -->
+         <VBox style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+            <Label style="-fx-font-size: 12px; -fx-text-fill: #6C757D;" text="Sessioni Totali" />
+            <Label fx:id="lblSessioniTotali" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #28A745;" text="0" />
+         </VBox>
+         
+         <!-- Card Sessioni Online -->
+         <VBox style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+            <Label style="-fx-font-size: 12px; -fx-text-fill: #6C757D;" text="Sessioni Online" />
+            <Label fx:id="lblSessioniOnline" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #17A2B8;" text="0" />
+         </VBox>
+         
+         <!-- Card Sessioni Presenza -->
+         <VBox style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+            <Label style="-fx-font-size: 12px; -fx-text-fill: #6C757D;" text="Sessioni Presenza" />
+            <Label fx:id="lblSessioniPresenza" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #FD7E14;" text="0" />
+         </VBox>
+         
+         <!-- Card Ricette Associate -->
+         <VBox style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+            <Label style="-fx-font-size: 12px; -fx-text-fill: #6C757D;" text="Ricette Associate" />
+            <Label fx:id="lblRicetteAssociate" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #DC3545;" text="0" />
+         </VBox>
+         
+         <!-- Card Categoria Popolare -->
+         <VBox style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+            <Label style="-fx-font-size: 12px; -fx-text-fill: #6C757D;" text="Categoria Più Popolare" />
+            <Label fx:id="lblCategoriaPopolare" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #6F42C1;" text="N/A" />
+         </VBox>
+      </VBox>
+   </left>
+     <center>
+      <!-- Container principale per i grafici -->
+      <BorderPane fx:id="graficoContainer" style="-fx-padding: 10;">
+         <center>
+            <Label style="-fx-font-size: 16px; -fx-text-fill: #6C757D;" text="Seleziona un tipo di grafico per visualizzare i dati" />
+         </center>
+      </BorderPane>
+   </center>
+</BorderPane>
