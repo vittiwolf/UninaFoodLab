@@ -13,7 +13,10 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -30,7 +33,42 @@ public class DialogHelper {
         this.messageHelper = messageHelper;
     }
     
+    // ==================== HELPER METHODS ====================
+    
+    /**
+     * Crea mappa delle etichette per la frequenza
+     */
+    private Map<String, String> getFrequencyLabels() {
+        Map<String, String> labels = new HashMap<>();
+        labels.put("Settimanale", "settimanale");
+        labels.put("Ogni 2 giorni", "ogni_due_giorni");
+        labels.put("Giornaliero", "giornaliero");
+        return labels;
+    }
+    
+    /**
+     * Trova la chiave (etichetta) dal valore della frequenza
+     */
+    private String getLabelFromValue(String value) {
+        Map<String, String> labels = getFrequencyLabels();
+        return labels.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(value))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(value);
+    }
+    
     // ==================== DIALOGS PER SESSIONI ====================
+    
+    /**
+     * Valida che la data della sessione non sia precedente alla data di inizio del corso
+     */
+    private boolean isValidDataSessione(LocalDate dataSessione, Corso corso) {
+        if (dataSessione == null || corso == null || corso.getDataInizio() == null) {
+            return false;
+        }
+        return !dataSessione.isBefore(corso.getDataInizio());
+    }
     
     public void mostraDialogNuovaSessione(Corso corso, Runnable onSuccess) {
         Dialog<Sessione> dialog = new Dialog<>();
@@ -75,19 +113,33 @@ public class DialogHelper {
 
         // Validazione in tempo reale
         txtTitolo.textProperty().addListener((observable, oldValue, newValue) -> {
-            creaButton.setDisable(newValue.trim().isEmpty());
+            creaButton.setDisable(newValue.trim().isEmpty() || !isValidDataSessione(dateSessione.getValue(), corso));
+        });
+        
+        // Validazione data sessione
+        dateSessione.valueProperty().addListener((observable, oldValue, newValue) -> {
+            creaButton.setDisable(txtTitolo.getText().trim().isEmpty() || !isValidDataSessione(newValue, corso));
         });
 
         // Converte il risultato in una Sessione quando Crea è premuto
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == confermaButtonType) {
                 try {
+                    LocalDate dataSessione = dateSessione.getValue();
+                    
+                    // Validazione della data
+                    if (!isValidDataSessione(dataSessione, corso)) {
+                        messageHelper.mostraErrore("La data della sessione non può essere precedente alla data di inizio del corso (" + 
+                                                  corso.getDataInizio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + ")");
+                        return null;
+                    }
+                    
                     Sessione sessione = new Sessione();
                     sessione.setCorsoId(corso.getId());
                     sessione.setNumeroSessione(numeroSessione);
                     sessione.setTitolo(txtTitolo.getText().trim());
                     sessione.setDescrizione(txtDescrizione.getText().trim());
-                    sessione.setDataSessione(dateSessione.getValue());
+                    sessione.setDataSessione(dataSessione);
                     sessione.setTipo(cmbTipo.getValue());
                     
                     int durata = Integer.parseInt(txtDurata.getText().trim());
@@ -119,6 +171,9 @@ public class DialogHelper {
         Dialog<Sessione> dialog = new Dialog<>();
         dialog.setTitle("Modifica Sessione");
         dialog.setHeaderText("Modifica sessione: " + sessione.getTitolo());
+
+        // Ottieni il corso per la validazione della data
+        Corso corso = service.getCorsoById(sessione.getCorsoId());
 
         // Configura i bottoni
         ButtonType confermaButtonType = new ButtonType("Salva", ButtonBar.ButtonData.OK_DONE);
@@ -152,16 +207,32 @@ public class DialogHelper {
 
         // Validazione in tempo reale
         txtTitolo.textProperty().addListener((observable, oldValue, newValue) -> {
-            salvaButton.setDisable(newValue.trim().isEmpty());
+            salvaButton.setDisable(newValue.trim().isEmpty() || 
+                (corso != null && !isValidDataSessione(dateSessione.getValue(), corso)));
+        });
+        
+        // Validazione data sessione
+        dateSessione.valueProperty().addListener((observable, oldValue, newValue) -> {
+            salvaButton.setDisable(txtTitolo.getText().trim().isEmpty() || 
+                (corso != null && !isValidDataSessione(newValue, corso)));
         });
 
         // Converte il risultato in una Sessione quando Salva è premuto
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == confermaButtonType) {
                 try {
+                    LocalDate dataSessione = dateSessione.getValue();
+                    
+                    // Validazione della data
+                    if (corso != null && !isValidDataSessione(dataSessione, corso)) {
+                        messageHelper.mostraErrore("La data della sessione non può essere precedente alla data di inizio del corso (" + 
+                                                  corso.getDataInizio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + ")");
+                        return null;
+                    }
+                    
                     sessione.setTitolo(txtTitolo.getText().trim());
                     sessione.setDescrizione(txtDescrizione.getText().trim());
-                    sessione.setDataSessione(dateSessione.getValue());
+                    sessione.setDataSessione(dataSessione);
                     sessione.setTipo(cmbTipo.getValue());
                     
                     int durata = Integer.parseInt(txtDurata.getText().trim());
@@ -322,7 +393,7 @@ public class DialogHelper {
     
     // ==================== DIALOG PER ASSOCIAZIONE RICETTE ====================
     
-    public void mostraDialogAssociazioneRicetta(Sessione sessione, ObservableList<Ricetta> listaRicette) {
+    public void mostraDialogAssociazioneRicetta(Sessione sessione, ObservableList<Ricetta> listaRicette, Runnable onSuccessRefresh) {
         // Crea un dialog personalizzato per selezionare le ricette
         Dialog<List<Integer>> dialog = new Dialog<>();
         dialog.setTitle("Associa Ricette alla Sessione");
@@ -376,7 +447,11 @@ public class DialogHelper {
         Optional<List<Integer>> result = dialog.showAndWait();
         result.ifPresent(ricetteIds -> {
             if (!ricetteIds.isEmpty()) {
-                associaRicetteASessione(sessione.getId(), ricetteIds);
+                int create = associaRicetteASessione(sessione.getId(), ricetteIds);
+                if (create > 0 && onSuccessRefresh != null) {
+                    // Aggiorna la tabella sessioni dopo l'associazione
+                    javafx.application.Platform.runLater(onSuccessRefresh);
+                }
             } else {
                 messageHelper.mostraAvviso("Attenzione", "Nessuna ricetta selezionata");
             }
@@ -682,17 +757,18 @@ public class DialogHelper {
         }
         
         TextField txtDurataOre = new TextField();
-        txtDurataOre.setPromptText("Durata totale in ore");
+        txtDurataOre.setPromptText("Durata in ore (1-8)");
         
         TextField txtMaxPartecipanti = new TextField();
-        txtMaxPartecipanti.setPromptText("Numero massimo partecipanti");
+        txtMaxPartecipanti.setPromptText("Max partecipanti (1-50)");
         
         TextField txtPrezzo = new TextField();
         txtPrezzo.setPromptText("Prezzo del corso");
         
         ComboBox<String> cmbFrequenza = new ComboBox<>();
-        cmbFrequenza.getItems().addAll("settimanale", "bisettimanale", "mensile");
-        cmbFrequenza.setValue("settimanale");
+        Map<String, String> frequencyLabels = getFrequencyLabels();
+        cmbFrequenza.getItems().addAll(frequencyLabels.keySet());
+        cmbFrequenza.setValue("Settimanale");
         
         TextField txtNumeroSessioni = new TextField();
         txtNumeroSessioni.setPromptText("Numero di sessioni");
@@ -739,16 +815,24 @@ public class DialogHelper {
                     corso.setTitolo(txtTitolo.getText().trim());
                     corso.setDescrizione(txtDescrizione.getText().trim());
                     corso.setCategoriaId(cmbCategoria.getValue().getId());
-                      int durataOre = Integer.parseInt(txtDurataOre.getText().trim());
+                    int durataOre = Integer.parseInt(txtDurataOre.getText().trim());
+                    if (durataOre < 1 || durataOre > 8) {
+                        messageHelper.mostraErrore("La durata del corso deve essere compresa tra 1 e 8 ore");
+                        return null;
+                    }
                     corso.setDurata(durataOre);
                     
                     int maxPartecipanti = Integer.parseInt(txtMaxPartecipanti.getText().trim());
+                    if (maxPartecipanti < 1 || maxPartecipanti > 50) {
+                        messageHelper.mostraErrore("Il numero massimo di partecipanti deve essere compreso tra 1 e 50");
+                        return null;
+                    }
                     corso.setMaxPartecipanti(maxPartecipanti);
                     
                     BigDecimal prezzo = new BigDecimal(txtPrezzo.getText().trim());
                     corso.setPrezzo(prezzo);
                     
-                    corso.setFrequenza(cmbFrequenza.getValue());
+                    corso.setFrequenza(frequencyLabels.get(cmbFrequenza.getValue()));
                     
                     int numero_sessioni = Integer.parseInt(txtNumeroSessioni.getText().trim());
                     corso.setNumeroSessioni(numero_sessioni);
@@ -816,14 +900,17 @@ public class DialogHelper {
         }
         
         TextField txtDurataOre = new TextField(String.valueOf(corso.getDurata() != null ? corso.getDurata() : 0));
+        txtDurataOre.setPromptText("Durata in ore (1-8)");
         
         TextField txtMaxPartecipanti = new TextField(String.valueOf(corso.getMaxPartecipanti() != null ? corso.getMaxPartecipanti() : 0));
+        txtMaxPartecipanti.setPromptText("Max partecipanti (1-50)");
         
         TextField txtPrezzo = new TextField(corso.getPrezzo() != null ? corso.getPrezzo().toString() : "0.00");
         
         ComboBox<String> cmbFrequenza = new ComboBox<>();
-        cmbFrequenza.getItems().addAll("settimanale", "bisettimanale", "mensile");
-        cmbFrequenza.setValue(corso.getFrequenza() != null ? corso.getFrequenza() : "settimanale");
+        Map<String, String> frequencyLabelsEdit = getFrequencyLabels();
+        cmbFrequenza.getItems().addAll(frequencyLabelsEdit.keySet());
+        cmbFrequenza.setValue(getLabelFromValue(corso.getFrequenza() != null ? corso.getFrequenza() : "settimanale"));
         
         TextField txtNumeroSessioni = new TextField(String.valueOf(corso.getNumeroSessioni() != null ? corso.getNumeroSessioni() : 0));
         
@@ -869,15 +956,23 @@ public class DialogHelper {
                     corso.setCategoriaId(cmbCategoria.getValue().getId());
                     
                     int durataOre = Integer.parseInt(txtDurataOre.getText().trim());
+                    if (durataOre < 1 || durataOre > 8) {
+                        messageHelper.mostraErrore("La durata del corso deve essere compresa tra 1 e 8 ore");
+                        return null;
+                    }
                     corso.setDurata(durataOre);
                     
                     int maxPartecipanti = Integer.parseInt(txtMaxPartecipanti.getText().trim());
+                    if (maxPartecipanti < 1 || maxPartecipanti > 50) {
+                        messageHelper.mostraErrore("Il numero massimo di partecipanti deve essere compreso tra 1 e 50");
+                        return null;
+                    }
                     corso.setMaxPartecipanti(maxPartecipanti);
                     
                     BigDecimal prezzo = new BigDecimal(txtPrezzo.getText().trim());
                     corso.setPrezzo(prezzo);
                     
-                    corso.setFrequenza(cmbFrequenza.getValue());
+                    corso.setFrequenza(frequencyLabelsEdit.get(cmbFrequenza.getValue()));
                     
                     int numero_sessioni = Integer.parseInt(txtNumeroSessioni.getText().trim());
                     corso.setNumeroSessioni(numero_sessioni);
@@ -1020,9 +1115,9 @@ public class DialogHelper {
         }
     }
     
-    private void associaRicetteASessione(Integer sessione_id, List<Integer> ricetteIds) {
+    private int associaRicetteASessione(Integer sessione_id, List<Integer> ricetteIds) {
+        int associazioniCreate = 0;
         try {
-            int associazioniCreate = 0;
             for (int i = 0; i < ricetteIds.size(); i++) {
                 Integer ricetta_id = ricetteIds.get(i);
                 boolean successo = service.associaRicettaASessione(sessione_id, ricetta_id, i + 1);
@@ -1030,18 +1125,16 @@ public class DialogHelper {
                     associazioniCreate++;
                 }
             }
-            
             if (associazioniCreate > 0) {
-                messageHelper.mostraSuccesso("Successo", 
-                    "Associate " + associazioniCreate + " ricette alla sessione con successo!");
+                messageHelper.mostraSuccesso("Successo", "Associate " + associazioniCreate + " ricette alla sessione con successo!");
                 logger.info("Associate {} ricette alla sessione ID: {}", associazioniCreate, sessione_id);
             } else {
                 messageHelper.mostraErrore("Nessuna ricetta è stata associata correttamente");
             }
-            
         } catch (Exception e) {
             logger.error("Errore nell'associazione delle ricette", e);
             messageHelper.mostraErrore("Errore nell'associazione delle ricette: " + e.getMessage());
         }
+        return associazioniCreate;
     }
 }

@@ -73,9 +73,7 @@ public class ReportDAO {
                     report.setNumeroCorsiTotali(rs.getInt("numero_corsi_totali"));
                     report.setNumeroSessioniOnline(rs.getInt("numero_sessioni_online"));
                     report.setNumeroSessioniPratiche(rs.getInt("numero_sessioni_pratiche"));
-                    report.setMediaRicettePerSessione(rs.getDouble("media_ricette_per_sessione"));
-                    report.setMassimoRicettePerSessione(rs.getInt("massimo_ricette_per_sessione"));
-                    report.setMinimoRicettePerSessione(rs.getInt("minimo_ricette_per_sessione"));
+                    // Campi media/max/min rimossi dal modello: ignorati
 
                     logger.info("Report mensile generato per chef ID: {} - {}/{}", chefId, mese, anno);
                     return Optional.of(report);

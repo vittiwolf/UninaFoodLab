@@ -23,7 +23,8 @@ public class CorsoDAO {
         List<Corso> corsi = new ArrayList<>();
         String sql = """
             SELECT c.id, c.chef_id, c.categoria_id, c.titolo, c.descrizione, 
-                   c.data_inizio, c.frequenza, c.numero_sessioni, c.prezzo, c.created_at,
+                   c.data_inizio, c.frequenza, c.numero_sessioni, c.prezzo, 
+                   c.durata_corso, c.max_partecipanti, c.created_at,
                    ch.nome || ' ' || ch.cognome as nome_chef,
                    cat.nome as nome_categoria
             FROM corsi c
@@ -59,7 +60,8 @@ public class CorsoDAO {
         List<Corso> corsi = new ArrayList<>();
         String sql = """
             SELECT c.id, c.chef_id, c.categoria_id, c.titolo, c.descrizione, 
-                   c.data_inizio, c.frequenza, c.numero_sessioni, c.prezzo, c.created_at,
+                   c.data_inizio, c.frequenza, c.numero_sessioni, c.prezzo, 
+                   c.durata_corso, c.max_partecipanti, c.created_at,
                    ch.nome || ' ' || ch.cognome as nome_chef,
                    cat.nome as nome_categoria
             FROM corsi c
@@ -95,7 +97,8 @@ public class CorsoDAO {
     public Optional<Corso> findById(Integer id) {
         String sql = """
             SELECT c.id, c.chef_id, c.categoria_id, c.titolo, c.descrizione, 
-                   c.data_inizio, c.frequenza, c.numero_sessioni, c.prezzo, c.created_at,
+                   c.data_inizio, c.frequenza, c.numero_sessioni, c.prezzo, 
+                   c.durata_corso, c.max_partecipanti, c.created_at,
                    ch.nome || ' ' || ch.cognome as nome_chef,
                    cat.nome as nome_categoria
             FROM corsi c
@@ -127,8 +130,8 @@ public class CorsoDAO {
     public Corso save(Corso corso) {
         String sql = """
             INSERT INTO corsi (chef_id, categoria_id, titolo, descrizione, data_inizio, 
-                              frequenza, numero_sessioni, prezzo)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                              frequenza, numero_sessioni, prezzo, durata_corso, max_partecipanti)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -142,6 +145,8 @@ public class CorsoDAO {
             stmt.setString(6, corso.getFrequenza());
             stmt.setInt(7, corso.getNumeroSessioni());
             stmt.setBigDecimal(8, corso.getPrezzo());
+            stmt.setInt(9, corso.getDurata() != null ? corso.getDurata() : 2);
+            stmt.setInt(10, corso.getMaxPartecipanti() != null ? corso.getMaxPartecipanti() : 10);
 
             int rowsAffected = stmt.executeUpdate();
             
@@ -156,7 +161,7 @@ public class CorsoDAO {
             }
         } catch (SQLException e) {
             logger.error("Errore durante il salvataggio del corso", e);
-            throw new RuntimeException("Errore durante il salvataggio del corso", e);
+            throw new RuntimeException(getErrorMessage(e), e);
         }
 
         throw new RuntimeException("Impossibile salvare il corso");
@@ -169,7 +174,7 @@ public class CorsoDAO {
         String sql = """
             UPDATE corsi 
             SET categoria_id = ?, titolo = ?, descrizione = ?, data_inizio = ?, 
-                frequenza = ?, numero_sessioni = ?, prezzo = ?
+                frequenza = ?, numero_sessioni = ?, prezzo = ?, durata_corso = ?, max_partecipanti = ?
             WHERE id = ?
             """;
 
@@ -183,7 +188,9 @@ public class CorsoDAO {
             stmt.setString(5, corso.getFrequenza());
             stmt.setInt(6, corso.getNumeroSessioni());
             stmt.setBigDecimal(7, corso.getPrezzo());
-            stmt.setInt(8, corso.getId());
+            stmt.setInt(8, corso.getDurata() != null ? corso.getDurata() : 2);
+            stmt.setInt(9, corso.getMaxPartecipanti() != null ? corso.getMaxPartecipanti() : 10);
+            stmt.setInt(10, corso.getId());
 
             int rowsAffected = stmt.executeUpdate();
             
@@ -195,7 +202,7 @@ public class CorsoDAO {
             }
         } catch (SQLException e) {
             logger.error("Errore durante l'aggiornamento del corso", e);
-            throw new RuntimeException("Errore durante l'aggiornamento del corso", e);
+            throw new RuntimeException(getErrorMessage(e), e);
         }
     }
 
@@ -273,11 +280,39 @@ public class CorsoDAO {
         corso.setNomeChef(rs.getString("nome_chef"));
         corso.setNomeCategoria(rs.getString("nome_categoria"));
         
+        // Aggiungi i nuovi campi
+        corso.setDurata(rs.getInt("durata_corso"));
+        corso.setMaxPartecipanti(rs.getInt("max_partecipanti"));
+        
         Timestamp created_at = rs.getTimestamp("created_at");
         if (created_at != null) {
             corso.setCreatedAt(created_at.toLocalDateTime());
         }
 
         return corso;
+    }
+
+    /**
+     * Metodo helper per gestire gli errori di violazione dei vincoli CHECK
+     */
+    private String getErrorMessage(SQLException e) {
+        String errorMessage = e.getMessage();
+        
+        // Gestione errori specifici per i vincoli CHECK
+        if (errorMessage.contains("chk_durata_corso_valida")) {
+            return "Errore: La durata del corso deve essere compresa tra 1 e 8 ore.";
+        } else if (errorMessage.contains("chk_max_partecipanti_valido")) {
+            return "Errore: Il numero massimo di partecipanti deve essere compreso tra 1 e 50.";
+        } else if (errorMessage.contains("CHECK")) {
+            return "Errore: I dati inseriti non rispettano i vincoli di validazione.";
+        } else if (errorMessage.contains("UNIQUE")) {
+            return "Errore: Esiste già un corso con questo titolo.";
+        } else if (errorMessage.contains("NOT NULL")) {
+            return "Errore: Tutti i campi obbligatori devono essere compilati.";
+        } else if (errorMessage.contains("FOREIGN KEY")) {
+            return "Errore: Riferimento non valido a chef o categoria.";
+        } else {
+            return "Errore durante l'operazione sul corso: " + errorMessage;
+        }
     }
 }

@@ -1,6 +1,7 @@
 package it.unina.uninafoodlab.controller;
 
 import it.unina.uninafoodlab.controller.helper.*;
+import it.unina.uninafoodlab.App;
 import it.unina.uninafoodlab.model.*;
 import it.unina.uninafoodlab.service.UninaFoodLabService;
 import javafx.fxml.FXML;
@@ -45,6 +46,8 @@ public class MainController implements Initializable {
     @FXML private TableColumn<Corso, String> colCategoriaCorso;
     @FXML private TableColumn<Corso, String> colFrequenza;
     @FXML private TableColumn<Corso, String> colDataInizio;
+    @FXML private TableColumn<Corso, Integer> colDurataCorso;
+    @FXML private TableColumn<Corso, Integer> colMaxPartecipanti;
     @FXML private TableColumn<Corso, String> colStato;
     
     @FXML private ComboBox<CategoriaCorso> cmbFiltraCategoria;
@@ -58,7 +61,8 @@ public class MainController implements Initializable {
     @FXML private TableColumn<Sessione, String> colDataSessione;
     @FXML private TableColumn<Sessione, String> colTipoSessione;
     @FXML private TableColumn<Sessione, String> colModalita;
-    @FXML private TableColumn<Sessione, Boolean> colCompletata;
+    @FXML private TableColumn<Sessione, String> colCompletata;
+    @FXML private TableColumn<Sessione, String> colRicetteAssociate;
     
     @FXML private Button btnNuovaSessione;
     @FXML private Button btnModificaSessione;
@@ -82,7 +86,7 @@ public class MainController implements Initializable {
     @FXML private TableColumn<Utente, String> colCognomeUtente;
     @FXML private TableColumn<Utente, String> colEmailUtente;
     @FXML private TableColumn<Utente, String> colLivelloEsperienza;
-    @FXML private TableColumn<Utente, Boolean> colUtenteAttivo;
+    @FXML private TableColumn<Utente, String> colUtenteAttivo;
     
     @FXML private Button btnNuovoUtente;
     @FXML private Button btnModificaUtente;
@@ -107,6 +111,16 @@ public class MainController implements Initializable {
         configuraTabelleEColonne();
         configuraComboBox();
         caricaDatiIniziali();
+        // Imposta policy di resize vincolata così da usare tutta la larghezza disponibile
+        applicaResizePolicy();
+    }
+
+    private void applicaResizePolicy() {
+        if (tabellaCorsi != null) tabellaCorsi.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        if (tabellaSessioni != null) tabellaSessioni.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        if (tabellaRicette != null) tabellaRicette.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        if (tabellaUtenti != null) tabellaUtenti.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        if (tabellaIscrizioni != null) tabellaIscrizioni.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
     }
     
     /**
@@ -123,6 +137,7 @@ public class MainController implements Initializable {
         
         // SOLUZIONE RIDIMENSIONAMENTO: Configura listener per gestire ridimensionamento finestra
         configuraTabellePerRidimensionamento();
+        applicaResizePolicy(); // assicurati che la policy sia applicata anche dopo eventuale popolamento dati
     }
     
     /**
@@ -225,10 +240,11 @@ public class MainController implements Initializable {
       private void configuraTabelleEColonne() {
         // Configura tabelle usando il TableManager
         tableManager.configuraTabellaCorsi(tabellaCorsi, colIdCorso, colTitoloCorso, 
-                                         colCategoriaCorso, colFrequenza, colDataInizio, colStato);
+                                         colCategoriaCorso, colFrequenza, colDataInizio, 
+                                         colDurataCorso, colMaxPartecipanti, colStato);
         
         tableManager.configuraTabellaSessioni(tabellaSessioni, colNumeroSessione, colTitoloSessione,
-                                            colDataSessione, colTipoSessione, colModalita, colCompletata);
+                                            colDataSessione, colTipoSessione, colModalita, colCompletata, colRicetteAssociate);
         
         tableManager.configuraTabellaRicette(tabellaRicette, colIdRicetta, colNomeRicetta,
                                            colCategoriaRicetta, colDifficolta, colTempoPreparazione);
@@ -277,22 +293,16 @@ public class MainController implements Initializable {
     
     @FXML
     private void logout() {
-        logger.info("Logout utente: {}", chefLoggato.getUsername());
+        logger.info("Logout utente: {}", chefLoggato != null ? chefLoggato.getUsername() : "sconosciuto");
         try {
-            // Chiudi la finestra corrente
-            Stage currentStage = (Stage) mainTabPane.getScene().getWindow();
-            currentStage.close();
-            
-            // Riapri la finestra di login
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginView.fxml"));
-            Parent root = loader.load();
-            
-            Stage loginStage = new Stage();
-            loginStage.setTitle("UninaFoodLab - Login");
-            loginStage.setScene(new Scene(root));
-            loginStage.show();
-            
-        } catch (IOException e) {
+            // Resetta stato autenticazione
+            LoginController.logout();
+            chefLoggato = null;
+
+            // Riutilizza il primaryStage dell'applicazione evitando di creare un nuovo Stage.
+            // In questo modo al nuovo login la finestra di login verrà sostituita dalla main window come al primo accesso.
+            App.showLoginWindow();
+        } catch (Exception e) {
             logger.error("Errore durante logout", e);
             messageHelper.mostraErrore("Errore durante il logout: " + e.getMessage());
         }
@@ -373,7 +383,14 @@ public class MainController implements Initializable {
         if (conferma) {
             try {
                 service.eliminaCorso(corsoSelezionato.getId());
+                // Ricarica corsi
                 tableManager.caricaCorsiChef(chefLoggato.getId());
+                // Dopo eliminazione corso: ricarica anche sessioni (svuotate) e iscrizioni
+                tabellaSessioni.getItems().clear();
+                // Refresh iscrizioni per riflettere eliminazioni cascade/trigger
+                tableManager.caricaIscrizioni();
+                // Pulisce eventuale selezione residua
+                tabellaIscrizioni.getSelectionModel().clearSelection();
                 messageHelper.mostraSuccesso("Successo", "Corso eliminato con successo");
                 logger.info("Corso eliminato: {}", corsoSelezionato.getTitolo());
             } catch (Exception e) {
@@ -432,7 +449,7 @@ public class MainController implements Initializable {
         }
         
         try {
-            dialogHelper.mostraDialogAssociazioneRicetta(sessioneSelezionata, tableManager.getListaRicette());
+            dialogHelper.mostraDialogAssociazioneRicetta(sessioneSelezionata, tableManager.getListaRicette(), this::aggiornaTabellaSessioni);
         } catch (Exception e) {
             logger.error("Errore nell'associazione ricetta", e);
             messageHelper.mostraErrore("Errore nell'associazione ricetta: " + e.getMessage());
@@ -548,24 +565,24 @@ public class MainController implements Initializable {
     private void disattivaUtente() {
         Utente utenteSelezionato = tabellaUtenti.getSelectionModel().getSelectedItem();
         if (utenteSelezionato == null) {
-            messageHelper.mostraAvviso("Attenzione", "Seleziona un utente da disattivare");
+            messageHelper.mostraAvviso("Attenzione", "Seleziona un utente da eliminare");
             return;
         }
         
-        boolean conferma = messageHelper.mostraConferma("Conferma disattivazione",
-                                                       "Disattivazione utente",
-                                                       "Sei sicuro di voler disattivare l'utente '" + 
+        boolean conferma = messageHelper.mostraConferma("Conferma eliminazione",
+                                                       "Eliminazione utente",
+                                                       "Sei sicuro di voler eliminare l'utente '" + 
                                                        utenteSelezionato.getNome() + " " + utenteSelezionato.getCognome() + "'?");
         
         if (conferma) {
             try {
                 service.disattivaUtente(utenteSelezionato.getId());
                 aggiornaTabellaUtenti();
-                messageHelper.mostraSuccesso("Successo", "Utente disattivato con successo");
-                logger.info("Utente disattivato: {} {}", utenteSelezionato.getNome(), utenteSelezionato.getCognome());
+                messageHelper.mostraSuccesso("Successo", "Utente eliminato con successo");
+                logger.info("Utente eliminato: {} {}", utenteSelezionato.getNome(), utenteSelezionato.getCognome());
             } catch (Exception e) {
-                logger.error("Errore nella disattivazione dell'utente", e);
-                messageHelper.mostraErrore("Errore nella disattivazione dell'utente: " + e.getMessage());
+                logger.error("Errore nell'eliminazione dell'utente", e);
+                messageHelper.mostraErrore("Errore nell'eliminazione dell'utente: " + e.getMessage());
             }
         }
     }

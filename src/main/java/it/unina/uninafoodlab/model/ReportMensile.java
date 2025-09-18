@@ -10,9 +10,7 @@ public class ReportMensile {
     private int numeroCorsiTotali;
     private int numeroSessioniOnline;
     private int numeroSessioniPratiche;
-    private double mediaRicettePerSessione;
-    private int massimoRicettePerSessione;
-    private int minimoRicettePerSessione;
+    private int ricetteTotali; // nuovo campo: numero totale di ricette associate alle sessioni del mese
 
     // Costruttore vuoto
     public ReportMensile() {}
@@ -20,17 +18,14 @@ public class ReportMensile {
     // Costruttore completo
     public ReportMensile(int mese, int anno, String nomeChef, int numeroCorsiTotali,
                          int numeroSessioniOnline, int numeroSessioniPratiche,
-                         double mediaRicettePerSessione, int massimoRicettePerSessione,
-                         int minimoRicettePerSessione) {
+                         int ricetteTotali) {
         this.mese = mese;
         this.anno = anno;
         this.nomeChef = nomeChef;
         this.numeroCorsiTotali = numeroCorsiTotali;
         this.numeroSessioniOnline = numeroSessioniOnline;
         this.numeroSessioniPratiche = numeroSessioniPratiche;
-        this.mediaRicettePerSessione = mediaRicettePerSessione;
-        this.massimoRicettePerSessione = massimoRicettePerSessione;
-        this.minimoRicettePerSessione = minimoRicettePerSessione;
+        this.ricetteTotali = ricetteTotali;
     }
 
     // Getters e Setters
@@ -52,14 +47,9 @@ public class ReportMensile {
     public int getNumeroSessioniPratiche() { return numeroSessioniPratiche; }
     public void setNumeroSessioniPratiche(int numeroSessioniPratiche) { this.numeroSessioniPratiche = numeroSessioniPratiche; }
 
-    public double getMediaRicettePerSessione() { return mediaRicettePerSessione; }
-    public void setMediaRicettePerSessione(double mediaRicettePerSessione) { this.mediaRicettePerSessione = mediaRicettePerSessione; }
 
-    public int getMassimoRicettePerSessione() { return massimoRicettePerSessione; }
-    public void setMassimoRicettePerSessione(int massimoRicettePerSessione) { this.massimoRicettePerSessione = massimoRicettePerSessione; }
-
-    public int getMinimoRicettePerSessione() { return minimoRicettePerSessione; }
-    public void setMinimoRicettePerSessione(int minimoRicettePerSessione) { this.minimoRicettePerSessione = minimoRicettePerSessione; }
+    public int getRicetteTotali() { return ricetteTotali; }
+    public void setRicetteTotali(int ricetteTotali) { this.ricetteTotali = ricetteTotali; }
 
     // Metodi di utilità
     public String getPeriodo() {

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -20,18 +21,18 @@ public class UninaFoodLabService {
     private final CorsoDAO corsoDAO;
     private final SessioneDAO sessioneDAO;
     private final RicettaDAO ricettaDAO;
-    private final ReportDAO reportDAO;
+    private final DashboardDAO dashboardDAO; // Sostituisce ReportDAO con funzionalità avanzate
     private final UtenteDAO utenteDAO;
-    private final IscrizioneDAO iscrizioneDAO;
+    private final IscrizioneDAOAdvanced iscrizioneDAO; // Aggiornato con funzionalità avanzate
 
     public UninaFoodLabService() {
         this.chefDAO = new ChefDAO();
         this.corsoDAO = new CorsoDAO();
         this.sessioneDAO = new SessioneDAO();
         this.ricettaDAO = new RicettaDAO();
-        this.reportDAO = new ReportDAO();
+        this.dashboardDAO = new DashboardDAO(); // Nuovo DAO avanzato
         this.utenteDAO = new UtenteDAO();
-        this.iscrizioneDAO = new IscrizioneDAO();
+        this.iscrizioneDAO = new IscrizioneDAOAdvanced(); // Nuovo DAO avanzato
     }
 
     // === AUTENTICAZIONE ===
@@ -338,38 +339,73 @@ public class UninaFoodLabService {
     // === REPORT MENSILI ===
 
     /**
-     * Genera report mensile per uno chef
+     * Genera report mensile per uno chef utilizzando il nuovo DashboardDAO
      */
-    public Optional<ReportMensile> generaReportMensile(Integer chefId, int mese, int anno) {
-        return reportDAO.generaReportMensile(chefId, mese, anno);
+    public Map<String, Object> generaReportMensile(Integer chefId, int mese, int anno) {
+        return dashboardDAO.generaReportMensile(chefId, mese, anno);
     }
 
     /**
      * Ottieni i periodi disponibili per i report di uno chef
      */
     public List<String> getPeriodiDisponibili(Integer chefId) {
-        return reportDAO.getMesiDisponibili(chefId);
+        return dashboardDAO.getMesiDisponibili(chefId);
     }
 
     /**
      * Ottieni dati per grafici - distribuzione corsi per categoria
      */
-    public List<Object[]> getStatisticheCorsi(Integer chefId, int mese, int anno) {
-        return reportDAO.getStatisticheCorsi(chefId, mese, anno);
+    public List<Map<String, Object>> getStatisticheCorsi(Integer chefId, int mese, int anno) {
+        return dashboardDAO.getStatisticheCorsi(chefId, mese, anno);
+    }
+
+    /**
+     * Ottieni distribuzione corsi per categoria dello chef
+     */
+    public Map<String, Integer> getDistribuzioneCorsiPerCategoria(Integer chefId) {
+        return dashboardDAO.getDistribuzioneCorsiPerCategoria(chefId);
+    }
+
+    /**
+     * Ottieni distribuzione sessioni per modalità dello chef
+     */
+    public Map<String, Integer> getDistribuzioneSessioniPerModalita(Integer chefId) {
+        return dashboardDAO.getDistribuzioneSessioniPerModalita(chefId);
+    }
+
+    /**
+     * Ottieni distribuzione ricette per difficoltà dello chef
+     */
+    public Map<String, Integer> getDistribuzioneRicettePerDifficolta(Integer chefId) {
+        return dashboardDAO.getDistribuzioneRicettePerDifficolta(chefId);
+    }
+
+    /**
+     * Distribuzione ricette per difficoltà filtrata per mese/anno (solo ricette effettivamente usate nelle sessioni di quel mese)
+     */
+    public Map<String, Integer> getDistribuzioneRicettePerDifficoltaMensile(Integer chefId, int anno, int mese) {
+        return dashboardDAO.getDistribuzioneRicettePerDifficoltaMensile(chefId, anno, mese);
+    }
+
+    /**
+     * Ottieni andamento mensile di corsi e sessioni dello chef
+     */
+    public Map<String, Map<String, Integer>> getAndamentoMensile(Integer chefId) {
+        return dashboardDAO.getAndamentoMensile(chefId);
     }
 
     /**
      * Ottieni dati per grafici - distribuzione sessioni per tipo
      */
-    public List<Object[]> getStatisticheSessioni(Integer chefId, int mese, int anno) {
-        return reportDAO.getStatisticheSessioni(chefId, mese, anno);
+    public List<Map<String, Object>> getStatisticheSessioni(Integer chefId, int mese, int anno) {
+        return dashboardDAO.getStatisticheSessioni(chefId, mese, anno);
     }
 
     /**
      * Ottieni dati per grafici - distribuzione ricette per sessione
      */
-    public List<Object[]> getDistribuzioneRicette(Integer chefId, int mese, int anno) {
-        return reportDAO.getDistribuzioneRicette(chefId, mese, anno);
+    public List<Map<String, Object>> getDistribuzioneRicette(Integer chefId, int mese, int anno) {
+        return dashboardDAO.getDistribuzioneRicette(chefId, mese, anno);
     }
 
     // === METODI PRIVATI DI UTILITÀ ===
@@ -481,6 +517,14 @@ public class UninaFoodLabService {
     }
     
     /**
+     * Ottieni un corso per ID
+     */
+    public Corso getCorsoById(Integer id) {
+        Optional<Corso> corso = corsoDAO.findById(id);
+        return corso.orElse(null);
+    }
+    
+    /**
      * Ottieni sessioni di un corso
      */
     public List<Sessione> getSessioniByCorso(int corso_id) {
@@ -492,6 +536,13 @@ public class UninaFoodLabService {
      */
     public List<Ricetta> getAllRicette() {
         return ricettaDAO.findAll();
+    }
+    
+    /**
+     * Ottieni le ricette associate a una sessione
+     */
+    public List<Ricetta> getRicetteSessione(Integer sessioneId) {
+        return sessioneDAO.getRicetteBySessioneId(sessioneId);
     }
       /**
      * Ottieni corsi di uno chef filtrati per categoria
@@ -548,11 +599,10 @@ public class UninaFoodLabService {
             return false;
         }
     }    /**
-     * Genera report mensile - versione overloaded con parametri diversi
+     * Genera report mensile - versione che ritorna Map per compatibilità con i nuovi DAO
      */
-    public ReportMensile generaReportMensileWrapper(Integer chefId, int anno, int mese) {
-        Optional<ReportMensile> report = generaReportMensile(chefId, mese, anno);
-        return report.orElse(new ReportMensile()); // Ritorna un report vuoto se non trovato
+    public Map<String, Object> generaReportMensileWrapper(Integer chefId, int anno, int mese) {
+        return generaReportMensile(chefId, mese, anno);
     }
     
     // === GESTIONE UTENTI ===
@@ -702,9 +752,8 @@ public class UninaFoodLabService {
             }
             
             // Verifica che il corso esista
-            List<Corso> corsi = corsoDAO.findByChefId(null); // Trova tutti i corsi
-            boolean corsoEsiste = corsi.stream().anyMatch(c -> c.getId().equals(corso_id));
-            if (!corsoEsiste) {
+            Optional<Corso> corsoOpt = corsoDAO.findById(corso_id);
+            if (corsoOpt.isEmpty()) {
                 throw new IllegalArgumentException("Corso non trovato");
             }
             
@@ -772,6 +821,14 @@ public class UninaFoodLabService {
      * Ottieni tutte le iscrizioni (solo attive per ora)
      */
     public List<Iscrizione> getAllIscrizioni() {
+        // Se disponibile il DAO avanzato, usiamo la versione con join per popolare i campi mostrati in tabella
+        if (iscrizioneDAO instanceof IscrizioneDAOAdvanced) {
+            IscrizioneDAOAdvanced adv = (IscrizioneDAOAdvanced) iscrizioneDAO;
+            List<Iscrizione> dettagliate = adv.findAllAttiveDettagliato();
+            if (!dettagliate.isEmpty()) {
+                return dettagliate;
+            }
+        }
         return iscrizioneDAO.findAllAttive();
     }
     

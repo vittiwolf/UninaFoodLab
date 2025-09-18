@@ -33,7 +33,7 @@ public class Corso {
     public Corso(Integer id, Integer chefId, String nomeChef, Integer categoria_id, 
                  String nomeCategoria, String titolo, String descrizione, 
                  LocalDate data_inizio, String frequenza, Integer numero_sessioni, 
-                 BigDecimal prezzo, LocalDateTime created_at) {
+                 BigDecimal prezzo, Integer durata, Integer maxPartecipanti, LocalDateTime created_at) {
         this.id = id;
         this.chefId = chefId;
         this.nomeChef = nomeChef;
@@ -45,10 +45,12 @@ public class Corso {
         this.frequenza = frequenza;
         this.numero_sessioni = numero_sessioni;
         this.prezzo = prezzo;
+        this.durata = durata;
+        this.maxPartecipanti = maxPartecipanti;
         this.created_at = created_at;
     }
 
-    // Costruttore per nuovo corso
+    // Costruttore per nuovo corso (compatibilità)
     public Corso(Integer chefId, Integer categoria_id, String titolo, String descrizione,
                  LocalDate data_inizio, String frequenza, Integer numero_sessioni, BigDecimal prezzo) {
         this.chefId = chefId;
@@ -59,6 +61,25 @@ public class Corso {
         this.frequenza = frequenza;
         this.numero_sessioni = numero_sessioni;
         this.prezzo = prezzo;
+        // Imposta valori di default per i nuovi campi
+        this.durata = 2;
+        this.maxPartecipanti = 10;
+    }
+
+    // Costruttore per nuovo corso completo
+    public Corso(Integer chefId, Integer categoria_id, String titolo, String descrizione,
+                 LocalDate data_inizio, String frequenza, Integer numero_sessioni, 
+                 BigDecimal prezzo, Integer durata, Integer maxPartecipanti) {
+        this.chefId = chefId;
+        this.categoria_id = categoria_id;
+        this.titolo = titolo;
+        this.descrizione = descrizione;
+        this.data_inizio = data_inizio;
+        this.frequenza = frequenza;
+        this.numero_sessioni = numero_sessioni;
+        this.prezzo = prezzo;
+        this.durata = durata;
+        this.maxPartecipanti = maxPartecipanti;
     }
 
     // Getters e Setters

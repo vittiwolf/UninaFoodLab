@@ -23,7 +23,7 @@ public class SessioneDAO {
         List<Sessione> sessioni = new ArrayList<>();
         String sql = """
             SELECT s.id, s.corso_id, s.numero_sessione, s.data_sessione, 
-                   s.tipo, s.titolo, s.descrizione, s.durata_minuti, s.created_at,
+                   s.tipo, s.titolo, s.descrizione, s.durata_minuti, s.completata, s.created_at,
                    c.titolo as titolo_corso
             FROM sessioni s
             JOIN corsi c ON s.corso_id = c.id
@@ -57,7 +57,7 @@ public class SessioneDAO {
         List<Sessione> sessioni = new ArrayList<>();
         String sql = """
             SELECT s.id, s.corso_id, s.numero_sessione, s.data_sessione, 
-                   s.tipo, s.titolo, s.descrizione, s.durata_minuti, s.created_at,
+                   s.tipo, s.titolo, s.descrizione, s.durata_minuti, s.completata, s.created_at,
                    c.titolo as titolo_corso
             FROM sessioni s
             JOIN corsi c ON s.corso_id = c.id
@@ -90,7 +90,7 @@ public class SessioneDAO {
     public Optional<Sessione> findById(Integer id) {
         String sql = """
             SELECT s.id, s.corso_id, s.numero_sessione, s.data_sessione, 
-                   s.tipo, s.titolo, s.descrizione, s.durata_minuti, s.created_at,
+                   s.tipo, s.titolo, s.descrizione, s.durata_minuti, s.completata, s.created_at,
                    c.titolo as titolo_corso
             FROM sessioni s
             JOIN corsi c ON s.corso_id = c.id
@@ -120,8 +120,8 @@ public class SessioneDAO {
     public Sessione save(Sessione sessione) {
         String sql = """
             INSERT INTO sessioni (corso_id, numero_sessione, data_sessione, tipo, 
-                                 titolo, descrizione, durata_minuti)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+                                 titolo, descrizione, durata_minuti, completata)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -134,6 +134,7 @@ public class SessioneDAO {
             stmt.setString(5, sessione.getTitolo());
             stmt.setString(6, sessione.getDescrizione());
             stmt.setInt(7, sessione.getDurataMinuti() != null ? sessione.getDurataMinuti() : 120);
+            stmt.setBoolean(8, sessione.getCompletata() != null ? sessione.getCompletata() : false);
 
             int rowsAffected = stmt.executeUpdate();
             
@@ -161,7 +162,7 @@ public class SessioneDAO {
         String sql = """
             UPDATE sessioni 
             SET numero_sessione = ?, data_sessione = ?, tipo = ?, 
-                titolo = ?, descrizione = ?, durata_minuti = ?
+                titolo = ?, descrizione = ?, durata_minuti = ?, completata = ?
             WHERE id = ?
             """;
 
@@ -174,7 +175,8 @@ public class SessioneDAO {
             stmt.setString(4, sessione.getTitolo());
             stmt.setString(5, sessione.getDescrizione());
             stmt.setInt(6, sessione.getDurataMinuti() != null ? sessione.getDurataMinuti() : 120);
-            stmt.setInt(7, sessione.getId());
+            stmt.setBoolean(7, sessione.getCompletata() != null ? sessione.getCompletata() : false);
+            stmt.setInt(8, sessione.getId());
 
             int rowsAffected = stmt.executeUpdate();
             
@@ -341,6 +343,7 @@ public class SessioneDAO {
         sessione.setTitolo(rs.getString("titolo"));
         sessione.setDescrizione(rs.getString("descrizione"));
         sessione.setDurataMinuti(rs.getInt("durata_minuti"));
+        sessione.setCompletata(rs.getBoolean("completata"));
         sessione.setTitoloCorso(rs.getString("titolo_corso"));
         
         Timestamp created_at = rs.getTimestamp("created_at");

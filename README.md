@@ -25,7 +25,7 @@ UninaFoodLab è un'applicazione desktop JavaFX per la gestione completa di corsi
 ```bash
 # 1. Setup database (una tantum)
 psql -U postgres -d uninafoodlab
-\i sql/setup_database.sql
+\i sql/setup_with_predata.sql
 
 # 2. Avvio applicazione
 mvn clean javafx:run
@@ -41,10 +41,10 @@ UninaFoodLab/
 │   ├── main/java/              # Applicazione principale
 │   └── main/resources/         # Risorse (FXML, CSS, config)
 ├── sql/                        # Script database
-│   ├── setup_database.sql      # Setup completo database
+│   ├── setup_with_predata.sql  # Setup completo database
 │   ├── structure_only.sql      # Solo struttura
-│   ├── test_data.sql          # Dati di test
-│   └── verify_database.sql    # Verifica funzionalità
+│   ├── predata_only.sql        # Dati di test
+│   └── structure_with_views_triggers.sql # Struttura + triggers e views
 ├── docs/                       # Documentazione tecnica
 │   ├── README.md              # Indice documentazione
 │   ├── installation.md       # Guida installazione
@@ -83,10 +83,10 @@ UninaFoodLab/
 ## 🛠️ Script Disponibili
 
 ### Database
-- `sql/setup_database.sql` - **PRINCIPALE** - Setup completo
+- `sql/setup_with_predata.sql` - **PRINCIPALE** - Setup completo
 - `sql/structure_only.sql` - Solo correzioni struttura
-- `sql/test_data.sql` - Inserimento dati di test
-- `sql/verify_database.sql` - Test funzionalità
+- `sql/predata_only.sql` - Inserimento dati di test
+- `sql/structure_with_views_triggers.sql` - Struttura + triggers e views
 
 ## 📚 Documentazione
 

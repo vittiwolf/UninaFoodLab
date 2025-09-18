@@ -47,6 +47,8 @@
                      <TableColumn fx:id="colCategoriaCorso" prefWidth="150.0" text="Categoria" />
                      <TableColumn fx:id="colFrequenza" prefWidth="120.0" text="Frequenza" />
                      <TableColumn fx:id="colDataInizio" prefWidth="120.0" text="Data Inizio" />
+                     <TableColumn fx:id="colDurataCorso" prefWidth="80.0" text="Durata (h)" />
+                     <TableColumn fx:id="colMaxPartecipanti" prefWidth="100.0" text="Max Part." />
                      <TableColumn fx:id="colStato" prefWidth="100.0" text="Stato" />
                   </columns>
                </TableView>
@@ -76,6 +78,7 @@
                      <TableColumn fx:id="colTipoSessione" prefWidth="100.0" text="Tipo" />
                      <TableColumn fx:id="colModalita" prefWidth="100.0" text="Modalità" />
                      <TableColumn fx:id="colCompletata" prefWidth="100.0" text="Completata" />
+                     <TableColumn fx:id="colRicetteAssociate" minWidth="150.0" prefWidth="200.0" text="Ricette Associate" />
                   </columns>
                </TableView>
             </VBox>
@@ -119,7 +122,7 @@
                   <Region HBox.hgrow="ALWAYS" />
                   <Button fx:id="btnNuovoUtente" onAction="#nuovoUtente" style="-fx-background-color: #28A745; -fx-text-fill: white;" text="Nuovo Utente" />
                   <Button fx:id="btnModificaUtente" onAction="#modificaUtente" text="Modifica" />
-                  <Button fx:id="btnDisattivaUtente" onAction="#disattivaUtente" style="-fx-background-color: #DC3545; -fx-text-fill: white;" text="Disattiva" />
+                  <Button fx:id="btnDisattivaUtente" onAction="#disattivaUtente" style="-fx-background-color: #DC3545; -fx-text-fill: white;" text="Elimina" />
                </HBox>
                  <!-- Tabella utenti -->
                <TableView fx:id="tabellaUtenti" VBox.vgrow="ALWAYS">

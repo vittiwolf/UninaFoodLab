@@ -16,6 +16,8 @@ public class Sessione {
     private String titolo;
     private String descrizione;
     private Integer durataMinuti;
+    private Boolean completata;
+    private String ricetteAssociate; // Campo per visualizzazione nella tabella
     private LocalDateTime created_at;
 
     // Costruttore vuoto
@@ -24,7 +26,7 @@ public class Sessione {
     // Costruttore completo
     public Sessione(Integer id, Integer corso_id, String titoloCorso, Integer numeroSessione,
                     LocalDate dataSessione, String tipo, String titolo, String descrizione,
-                    Integer durataMinuti, LocalDateTime created_at) {
+                    Integer durataMinuti, Boolean completata, LocalDateTime created_at) {
         this.id = id;
         this.corso_id = corso_id;
         this.titoloCorso = titoloCorso;
@@ -34,6 +36,7 @@ public class Sessione {
         this.titolo = titolo;
         this.descrizione = descrizione;
         this.durataMinuti = durataMinuti;
+        this.completata = completata;
         this.created_at = created_at;
     }
 
@@ -77,6 +80,9 @@ public class Sessione {
     public Integer getDurataMinuti() { return durataMinuti; }
     public void setDurataMinuti(Integer durataMinuti) { this.durataMinuti = durataMinuti; }
 
+    public Boolean getCompletata() { return completata; }
+    public void setCompletata(Boolean completata) { this.completata = completata; }
+
     public LocalDateTime getCreatedAt() { return created_at; }
     public void setCreatedAt(LocalDateTime created_at) { this.created_at = created_at; }
 
@@ -104,6 +110,20 @@ public class Sessione {
         } else {
             return minuti + "m";
         }
+    }
+
+    public String getCompletataDescrizione() {
+        return completata != null && completata ? "Sì" : "No";
+    }
+
+    public String getRicetteAssociate() {
+        // Questo campo sarà utilizzato dalla TableView per mostrare le ricette
+        // Il valore sarà impostato dal controller
+        return ricetteAssociate != null ? ricetteAssociate : "";
+    }
+
+    public void setRicetteAssociate(String ricetteAssociate) {
+        this.ricetteAssociate = ricetteAssociate;
     }
 
     @Override

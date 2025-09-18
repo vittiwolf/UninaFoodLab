@@ -1,5 +1,6 @@
 package it.unina.uninafoodlab.controller.helper;
 
+import it.unina.uninafoodlab.model.CategoriaCorso;
 import javafx.scene.control.*;
 
 /**
@@ -10,7 +11,7 @@ public class ValidationUtils {
     /**
      * Valida il form del corso
      */
-    public static ValidationResult validaFormCorso(TextField txtTitolo, ComboBox cmbCategoria,
+    public static ValidationResult validaFormCorso(TextField txtTitolo, ComboBox<CategoriaCorso> cmbCategoria,
             DatePicker dateInizio, TextField txtDurata,
             TextField txtMaxPartecipanti, TextField txtNumeroSessioni,
             TextField txtPrezzo) {

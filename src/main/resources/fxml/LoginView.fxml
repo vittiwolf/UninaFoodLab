@@ -23,7 +23,8 @@
             
             <!-- Icona/Logo -->
             <StackPane styleClass="logo-container">
-               <Circle radius="35.0" styleClass="logo-circle" />
+               <!-- Aggiunto fill inline come fallback nel caso lo stylesheet non sia caricato -->
+               <Circle radius="35.0" styleClass="logo-circle" fill="WHITE" />
                <Label text="🍳" styleClass="logo-emoji">
                   <font>
                      <Font size="32.0" />

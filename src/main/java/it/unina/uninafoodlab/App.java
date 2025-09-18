@@ -45,6 +45,12 @@ public class App extends Application {
         try {
             FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/LoginView.fxml"));
             Scene scene = new Scene(loader.load());
+            // Assicura che lo stylesheet principale sia caricato anche nella schermata di login
+            try {
+                scene.getStylesheets().add(App.class.getResource("/css/application.css").toExternalForm());
+            } catch (Exception cssEx) {
+                logger.warn("Stylesheet application.css non trovato: {}", cssEx.getMessage());
+            }
             
             primaryStage.setTitle("UninaFoodLab - Accesso Chef");
             primaryStage.setScene(scene);

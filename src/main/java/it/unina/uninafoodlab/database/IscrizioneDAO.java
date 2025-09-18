@@ -10,150 +10,17 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * DAO per la gestione delle Iscrizioni nel database
+ * DAO di base per la gestione delle Iscrizioni
  */
 public class IscrizioneDAO {
     private static final Logger logger = LoggerFactory.getLogger(IscrizioneDAO.class);
-
-    /**
-     * Ottieni tutte le iscrizioni di un corso
-     */
-    public List<Iscrizione> findByCorsoId(Integer corso_id) {
-        List<Iscrizione> iscrizioni = new ArrayList<>();
-        String sql = """
-            SELECT i.id, i.utente_id, i.corso_id, i.data_iscrizione, i.stato, i.note,
-                   u.nome, u.cognome, u.email,
-                   c.titolo as titolo_corso
-            FROM iscrizioni i
-            JOIN utenti u ON i.utente_id = u.id
-            JOIN corsi c ON i.corso_id = c.id
-            WHERE i.corso_id = ?
-            ORDER BY i.data_iscrizione DESC
-            """;
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, corso_id);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    iscrizioni.add(mapResultSetToIscrizione(rs));
-                }
-            }
-
-            logger.debug("Trovate {} iscrizioni per corso ID: {}", iscrizioni.size(), corso_id);
-
-        } catch (SQLException e) {
-            logger.error("Errore nel recupero delle iscrizioni per corso ID: {}", corso_id, e);
-        }
-
-        return iscrizioni;
-    }
-
-    /**
-     * Ottieni tutte le iscrizioni di un utente
-     */
-    public List<Iscrizione> findByUtenteId(Integer utente_id) {
-        List<Iscrizione> iscrizioni = new ArrayList<>();
-        String sql = """
-            SELECT i.id, i.utente_id, i.corso_id, i.data_iscrizione, i.stato, i.note,
-                   u.nome, u.cognome, u.email,
-                   c.titolo as titolo_corso
-            FROM iscrizioni i
-            JOIN utenti u ON i.utente_id = u.id
-            JOIN corsi c ON i.corso_id = c.id
-            WHERE i.utente_id = ?
-            ORDER BY i.data_iscrizione DESC
-            """;
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, utente_id);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    iscrizioni.add(mapResultSetToIscrizione(rs));
-                }
-            }
-
-            logger.debug("Trovate {} iscrizioni per utente ID: {}", iscrizioni.size(), utente_id);
-
-        } catch (SQLException e) {
-            logger.error("Errore nel recupero delle iscrizioni per utente ID: {}", utente_id, e);
-        }
-
-        return iscrizioni;
-    }
-
-    /**
-     * Trova un'iscrizione per ID
-     */
-    public Optional<Iscrizione> findById(Integer id) {
-        String sql = """
-            SELECT i.id, i.utente_id, i.corso_id, i.data_iscrizione, i.stato, i.note,
-                   u.nome, u.cognome, u.email,
-                   c.titolo as titolo_corso
-            FROM iscrizioni i
-            JOIN utenti u ON i.utente_id = u.id
-            JOIN corsi c ON i.corso_id = c.id
-            WHERE i.id = ?
-            """;
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapResultSetToIscrizione(rs));
-                }
-            }
-
-        } catch (SQLException e) {
-            logger.error("Errore nel recupero dell'iscrizione con ID: {}", id, e);
-        }
-
-        return Optional.empty();
-    }
-
-    /**
-     * Verifica se un utente è già iscritto a un corso
-     */
-    public boolean isUtenteIscritto(Integer utente_id, Integer corso_id) {
-        String sql = """
-            SELECT COUNT(*) 
-            FROM iscrizioni 
-            WHERE utente_id = ? AND corso_id = ? AND stato = 'ATTIVA'
-            """;
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, utente_id);
-            stmt.setInt(2, corso_id);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-
-        } catch (SQLException e) {
-            logger.error("Errore nel controllo iscrizione utente {} al corso {}", utente_id, corso_id, e);
-        }
-
-        return false;
-    }
 
     /**
      * Salva una nuova iscrizione
      */
     public Iscrizione save(Iscrizione iscrizione) {
         String sql = """
-            INSERT INTO iscrizioni (utente_id, corso_id, data_iscrizione, stato, note) 
+            INSERT INTO iscrizioni (utente_id, corso_id, data_iscrizione, stato, note)
             VALUES (?, ?, ?, ?, ?)
             """;
 
@@ -166,24 +33,27 @@ public class IscrizioneDAO {
             stmt.setString(4, iscrizione.getStato());
             stmt.setString(5, iscrizione.getNote());
 
-            int rowsAffected = stmt.executeUpdate();
+            int affectedRows = stmt.executeUpdate();
+            
+            if (affectedRows == 0) {
+                throw new SQLException("Creazione iscrizione fallita, nessuna riga interessata.");
+            }
 
-            if (rowsAffected == 1) {
-                try (ResultSet keys = stmt.getGeneratedKeys()) {
-                    if (keys.next()) {
-                        iscrizione.setId(keys.getInt(1));
-                        logger.info("Nuova iscrizione salvata con ID: {}", iscrizione.getId());
-                        return iscrizione;
-                    }
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    iscrizione.setId(generatedKeys.getInt(1));
+                } else {
+                    throw new SQLException("Creazione iscrizione fallita, nessun ID ottenuto.");
                 }
             }
 
-        } catch (SQLException e) {
-            logger.error("Errore durante il salvataggio dell'iscrizione: utente {} corso {}", 
-                        iscrizione.getUtenteId(), iscrizione.getCorsoId(), e);
-        }
+            logger.info("Iscrizione salvata con ID: {}", iscrizione.getId());
+            return iscrizione;
 
-        return null;
+        } catch (SQLException e) {
+            logger.error("Errore nel salvataggio dell'iscrizione", e);
+            throw new RuntimeException("Errore nel salvataggio dell'iscrizione", e);
+        }
     }
 
     /**
@@ -192,124 +62,68 @@ public class IscrizioneDAO {
     public Iscrizione update(Iscrizione iscrizione) {
         String sql = """
             UPDATE iscrizioni 
-            SET stato = ?, note = ?
+            SET utente_id = ?, corso_id = ?, data_iscrizione = ?, stato = ?, note = ?
             WHERE id = ?
             """;
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, iscrizione.getStato());
-            stmt.setString(2, iscrizione.getNote());
-            stmt.setInt(3, iscrizione.getId());
+            stmt.setInt(1, iscrizione.getUtenteId());
+            stmt.setInt(2, iscrizione.getCorsoId());
+            stmt.setTimestamp(3, Timestamp.valueOf(iscrizione.getDataIscrizione()));
+            stmt.setString(4, iscrizione.getStato());
+            stmt.setString(5, iscrizione.getNote());
+            stmt.setInt(6, iscrizione.getId());
 
-            int rowsAffected = stmt.executeUpdate();
-
-            if (rowsAffected == 1) {
-                logger.info("Iscrizione aggiornata: ID {}", iscrizione.getId());
-                return iscrizione;
+            int affectedRows = stmt.executeUpdate();
+            
+            if (affectedRows == 0) {
+                throw new SQLException("Aggiornamento iscrizione fallito, iscrizione non trovata con ID: " + iscrizione.getId());
             }
 
-        } catch (SQLException e) {
-            logger.error("Errore durante l'aggiornamento dell'iscrizione: ID {}", iscrizione.getId(), e);
-        }
+            logger.info("Iscrizione aggiornata con ID: {}", iscrizione.getId());
+            return iscrizione;
 
-        return null;
+        } catch (SQLException e) {
+            logger.error("Errore nell'aggiornamento dell'iscrizione con ID: {}", iscrizione.getId(), e);
+            throw new RuntimeException("Errore nell'aggiornamento dell'iscrizione", e);
+        }
     }
 
     /**
-     * Annulla un'iscrizione
+     * Trova un'iscrizione per ID
      */
-    public boolean annullaIscrizione(Integer id, String motivo) {
-        String sql = """
-            UPDATE iscrizioni 
-            SET stato = 'ANNULLATA', note = COALESCE(note || '; ', '') || ?
-            WHERE id = ?
-            """;
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, "Annullata: " + motivo);
-            stmt.setInt(2, id);
-
-            int rowsAffected = stmt.executeUpdate();
-
-            if (rowsAffected == 1) {
-                logger.info("Iscrizione annullata: ID {}", id);
-                return true;
-            }
-
-        } catch (SQLException e) {
-            logger.error("Errore durante l'annullamento dell'iscrizione: ID {}", id, e);
-        }
-
-        return false;
-    }
-
-    /**
-     * Completa un'iscrizione
-     */
-    public boolean completaIscrizione(Integer id) {
-        String sql = "UPDATE iscrizioni SET stato = 'COMPLETATA' WHERE id = ?";
+    public Optional<Iscrizione> findById(Integer id) {
+        String sql = "SELECT * FROM iscrizioni WHERE id = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            int rowsAffected = stmt.executeUpdate();
-
-            if (rowsAffected == 1) {
-                logger.info("Iscrizione completata: ID {}", id);
-                return true;
-            }
-
-        } catch (SQLException e) {
-            logger.error("Errore durante il completamento dell'iscrizione: ID {}", id, e);
-        }
-
-        return false;
-    }
-
-    /**
-     * Ottieni il numero di iscritti attivi per un corso
-     */
-    public int countIscrittiAttivi(Integer corso_id) {
-        String sql = "SELECT COUNT(*) FROM iscrizioni WHERE corso_id = ? AND stato = 'ATTIVA'";
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, corso_id);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1);
+                    Iscrizione iscrizione = mapResultSetToIscrizione(rs);
+                    logger.debug("Iscrizione trovata con ID: {}", id);
+                    return Optional.of(iscrizione);
                 }
             }
 
         } catch (SQLException e) {
-            logger.error("Errore nel conteggio iscritti per corso ID: {}", corso_id, e);
+            logger.error("Errore nella ricerca dell'iscrizione con ID: {}", id, e);
         }
 
-        return 0;
+        logger.debug("Iscrizione non trovata con ID: {}", id);
+        return Optional.empty();
     }
 
     /**
-     * Ottieni tutte le iscrizioni attive per report
+     * Trova tutte le iscrizioni
      */
-    public List<Iscrizione> findAllAttive() {
+    public List<Iscrizione> findAll() {
         List<Iscrizione> iscrizioni = new ArrayList<>();
-        String sql = """
-            SELECT i.id, i.utente_id, i.corso_id, i.data_iscrizione, i.stato, i.note,
-                   u.nome, u.cognome, u.email,
-                   c.titolo as titolo_corso
-            FROM iscrizioni i
-            JOIN utenti u ON i.utente_id = u.id
-            JOIN corsi c ON i.corso_id = c.id
-            WHERE i.stato = 'ATTIVA'
-            ORDER BY i.data_iscrizione DESC
-            """;
+        String sql = "SELECT * FROM iscrizioni ORDER BY data_iscrizione DESC";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -319,36 +133,169 @@ public class IscrizioneDAO {
                 iscrizioni.add(mapResultSetToIscrizione(rs));
             }
 
-            logger.debug("Trovate {} iscrizioni attive", iscrizioni.size());
+            logger.debug("Trovate {} iscrizioni", iscrizioni.size());
 
         } catch (SQLException e) {
-            logger.error("Errore nel recupero delle iscrizioni attive", e);
+            logger.error("Errore nel recupero di tutte le iscrizioni", e);
         }
 
         return iscrizioni;
     }
 
     /**
+     * Trova iscrizioni per utente ID
+     */
+    public List<Iscrizione> findByUtenteId(Integer utenteId) {
+        List<Iscrizione> iscrizioni = new ArrayList<>();
+        String sql = "SELECT * FROM iscrizioni WHERE utente_id = ? ORDER BY data_iscrizione DESC";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, utenteId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    iscrizioni.add(mapResultSetToIscrizione(rs));
+                }
+            }
+
+            logger.debug("Trovate {} iscrizioni per utente ID: {}", iscrizioni.size(), utenteId);
+
+        } catch (SQLException e) {
+            logger.error("Errore nel recupero iscrizioni per utente ID: {}", utenteId, e);
+        }
+
+        return iscrizioni;
+    }
+
+    /**
+     * Trova iscrizioni per corso ID
+     */
+    public List<Iscrizione> findByCorsoId(Integer corsoId) {
+        List<Iscrizione> iscrizioni = new ArrayList<>();
+        String sql = "SELECT * FROM iscrizioni WHERE corso_id = ? ORDER BY data_iscrizione DESC";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, corsoId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    iscrizioni.add(mapResultSetToIscrizione(rs));
+                }
+            }
+
+            logger.debug("Trovate {} iscrizioni per corso ID: {}", iscrizioni.size(), corsoId);
+
+        } catch (SQLException e) {
+            logger.error("Errore nel recupero iscrizioni per corso ID: {}", corsoId, e);
+        }
+
+        return iscrizioni;
+    }
+
+    /**
+     * Trova iscrizioni per stato
+     */
+    public List<Iscrizione> findByStato(String stato) {
+        List<Iscrizione> iscrizioni = new ArrayList<>();
+        String sql = "SELECT * FROM iscrizioni WHERE stato = ? ORDER BY data_iscrizione DESC";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, stato);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    iscrizioni.add(mapResultSetToIscrizione(rs));
+                }
+            }
+
+            logger.debug("Trovate {} iscrizioni con stato: {}", iscrizioni.size(), stato);
+
+        } catch (SQLException e) {
+            logger.error("Errore nel recupero iscrizioni per stato: {}", stato, e);
+        }
+
+        return iscrizioni;
+    }
+
+    /**
+     * Elimina un'iscrizione per ID
+     */
+    public boolean deleteById(Integer id) {
+        String sql = "DELETE FROM iscrizioni WHERE id = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            int affectedRows = stmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                logger.info("Iscrizione eliminata con ID: {}", id);
+                return true;
+            } else {
+                logger.warn("Nessuna iscrizione trovata con ID: {}", id);
+                return false;
+            }
+
+        } catch (SQLException e) {
+            logger.error("Errore nell'eliminazione dell'iscrizione con ID: {}", id, e);
+            return false;
+        }
+    }
+
+    /**
+     * Conta il numero di iscrizioni per un corso
+     */
+    public int countByCorsoId(Integer corsoId) {
+        String sql = "SELECT COUNT(*) FROM iscrizioni WHERE corso_id = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, corsoId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+
+        } catch (SQLException e) {
+            logger.error("Errore nel conteggio iscrizioni per corso ID: {}", corsoId, e);
+        }
+
+        return 0;
+    }
+
+    /**
      * Mappa un ResultSet a un oggetto Iscrizione
      */
-    private Iscrizione mapResultSetToIscrizione(ResultSet rs) throws SQLException {
+    protected Iscrizione mapResultSetToIscrizione(ResultSet rs) throws SQLException {
         Iscrizione iscrizione = new Iscrizione();
         iscrizione.setId(rs.getInt("id"));
         iscrizione.setUtenteId(rs.getInt("utente_id"));
         iscrizione.setCorsoId(rs.getInt("corso_id"));
-        iscrizione.setNomeUtente(rs.getString("nome"));
-        iscrizione.setCognomeUtente(rs.getString("cognome"));
-        iscrizione.setEmailUtente(rs.getString("email"));
-        iscrizione.setTitoloCorso(rs.getString("titolo_corso"));
         
-        Timestamp data_iscrizione = rs.getTimestamp("data_iscrizione");
-        if (data_iscrizione != null) {
-            iscrizione.setDataIscrizione(data_iscrizione.toLocalDateTime());
+        Timestamp timestamp = rs.getTimestamp("data_iscrizione");
+        if (timestamp != null) {
+            iscrizione.setDataIscrizione(timestamp.toLocalDateTime());
         }
         
         iscrizione.setStato(rs.getString("stato"));
         iscrizione.setNote(rs.getString("note"));
         
+        // I campi livello_esperienza e note_particolari non esistono nella tabella iscrizioni
+        // Questi dati dovrebbero essere recuperati dalla tabella utenti se necessario
+        // Per ora impostiamo valori di default
+        iscrizione.setLivelloEsperienza(null);
+        iscrizione.setNoteParticolari(null);
+
         return iscrizione;
     }
 }

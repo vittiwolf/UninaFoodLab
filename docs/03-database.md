@@ -2,7 +2,32 @@
 
 ## 📊 Schema del Database
 
-UninaFoodLab utilizza **PostgreSQL** come sistema di gestione database relazionale, con uno schema progettato per gestire efficacemente corsi di cucina, sessioni, ricette e relazioni tra entità.
+UninaFoodLab utilizza **PostgreSQL** come sistema di gestione database relazionale, con uno schema avanzato progettato per gestire efficacemente corsi di cucina, sessioni, ricette e relazioni tra entità. Il database include **funzioni personalizzate**, **trigger automatici** e **view avanzate** per garantire prestazioni ottimali e integrità dei dati.
+
+## 🚀 Funzionalità Avanzate Implementate
+
+### 🔧 Funzioni Personalizzate
+- **`calcola_eta(data_nascita)`**: Calcola l'età di un utente
+- **`valida_email(email)`**: Valida il formato dell'indirizzo email
+- **`calcola_prezzo_scontato(corso_id, sconto)`**: Calcola prezzi con sconti applicati
+- **`genera_codice_iscrizione()`**: Genera codici univoci per le iscrizioni
+- **`verifica_posti_disponibili(corso_id)`**: Verifica disponibilità posti nei corsi
+- **`calcola_statistiche_corso(corso_id)`**: Calcola statistiche complete per corso
+
+### ⚡ Trigger Automatici
+- **Timestamp automatici**: Aggiornamento automatico di `modified_at`
+- **Validazione email**: Controllo formato email in inserimento/aggiornamento
+- **Controllo posti**: Verifica automatica disponibilità prima dell'iscrizione
+- **Codici univoci**: Generazione automatica codici iscrizione
+- **Log modifiche**: Tracciamento completo delle modifiche alle iscrizioni
+
+### 📊 View Avanzate per Reporting
+- **`dashboard_admin`**: Metriche principali per amministratori
+- **`corsi_dettaglio`**: Vista completa corsi con statistiche
+- **`iscrizioni_complete`**: Dettagli completi iscrizioni con relazioni
+- **`report_chef`**: Performance e statistiche per ogni chef
+- **`analisi_iscrizioni_mensili`**: Analisi temporale delle iscrizioni
+- **`notifiche_sistema`**: Notifiche automatiche del sistema
 
 ## 🏗️ Diagramma ER
 
@@ -106,6 +131,60 @@ erDiagram
     RICETTE ||--o{ SESSIONI_RICETTE : viene_usata_in
     UTENTI ||--o{ ISCRIZIONI : effettua
 ```
+
+## 🎯 Esempi di Utilizzo delle Funzionalità Avanzate
+
+### Utilizzo delle Funzioni
+
+```sql
+-- Calcolare l'età di un utente
+SELECT nome, cognome, calcola_eta(data_nascita) as eta 
+FROM utenti WHERE id = 1;
+
+-- Verificare posti disponibili per un corso
+SELECT titolo, verifica_posti_disponibili(id) as posti_liberi 
+FROM corsi WHERE id = 1;
+
+-- Calcolare prezzo scontato
+SELECT titolo, prezzo, calcola_prezzo_scontato(id, 15) as prezzo_scontato 
+FROM corsi WHERE id = 1;
+
+-- Ottenere statistiche complete di un corso
+SELECT * FROM calcola_statistiche_corso(1);
+```
+
+### Utilizzo delle View
+
+```sql
+-- Dashboard amministratore
+SELECT * FROM dashboard_admin;
+
+-- Report dettagliato corsi
+SELECT titolo, iscritti_attivi, posti_disponibili, ricavo_corso 
+FROM corsi_dettaglio 
+WHERE stato_corso = 'In Corso';
+
+-- Analisi mensile delle iscrizioni
+SELECT periodo, totale_iscrizioni, ricavo_mensile 
+FROM analisi_iscrizioni_mensili 
+ORDER BY anno DESC, mese DESC 
+LIMIT 12;
+
+-- Performance chef
+SELECT chef_nome, corsi_totali, tasso_completamento_percentuale, ricavo_totale 
+FROM report_chef 
+ORDER BY ricavo_totale DESC;
+```
+
+### Trigger in Azione
+
+I trigger operano automaticamente:
+
+- ✅ **Validazione Email**: Le email vengono validate automaticamente
+- ✅ **Codici Iscrizione**: Generati automaticamente ad ogni nuova iscrizione
+- ✅ **Controllo Posti**: Impossibile iscriversi a corsi pieni
+- ✅ **Log Completo**: Tutte le modifiche alle iscrizioni vengono tracciate
+- ✅ **Timestamp**: Aggiornamento automatico di `modified_at`
 
 ## 📋 Tabelle del Database
 
@@ -642,3 +721,200 @@ CREATE INDEX IF NOT EXISTS idx_iscrizioni_utente ON iscrizioni(utente_id);
 CREATE INDEX IF NOT EXISTS idx_iscrizioni_corso ON iscrizioni(corso_id);
 CREATE INDEX IF NOT EXISTS idx_iscrizioni_stato ON iscrizioni(stato);
 ```
+
+## 🚀 Funzionalità Avanzate del Database (AGGIORNAMENTO 2025)
+
+### 📊 **Funzioni Personalizzate Implementate**
+
+#### 1. **Funzioni di Calcolo**
+
+```sql
+-- Calcolo età utente
+SELECT calcola_eta('1990-05-15'::DATE); -- Ritorna: 35
+
+-- Verifica posti disponibili
+SELECT verifica_posti_disponibili(1); -- Ritorna: numero posti liberi
+
+-- Calcolo prezzo scontato
+SELECT calcola_prezzo_scontato(1, 20); -- 20% di sconto
+```
+
+#### 2. **Funzioni di Validazione**
+
+```sql
+-- Validazione email
+SELECT valida_email('utente@example.com'); -- Ritorna: true
+SELECT valida_email('email-invalida'); -- Ritorna: false
+
+-- Generazione codice iscrizione
+SELECT genera_codice_iscrizione(); -- Ritorna: UFL2025XXXX
+```
+
+#### 3. **Funzioni di Statistiche**
+
+```sql
+-- Statistiche complete corso
+SELECT * FROM calcola_statistiche_corso(1);
+-- Ritorna: totale_iscritti, iscritti_attivi, tasso_completamento, ricavo_totale
+```
+
+### ⚡ **Trigger Automatici Attivi**
+
+#### 1. **Trigger di Sistema**
+- **`update_modified_at`**: Aggiorna automaticamente `modified_at` su tutte le tabelle
+- **`genera_codice_iscrizione`**: Crea codice univoco per ogni iscrizione
+- **`valida_email`**: Valida formato email su inserimento/aggiornamento
+
+#### 2. **Trigger di Business Logic**
+- **`controlla_posti_disponibili`**: Impedisce iscrizioni a corsi pieni
+- **`log_iscrizioni`**: Traccia tutte le modifiche alle iscrizioni
+
+#### 3. **Tabella di Log**
+
+```sql
+-- Visualizzare log modifiche iscrizioni
+SELECT * FROM log_iscrizioni 
+WHERE iscrizione_id = 1 
+ORDER BY timestamp_modifica DESC;
+```
+
+### 📈 **View Avanzate per Reporting**
+
+#### 1. **Dashboard Amministratore**
+
+```sql
+SELECT * FROM dashboard_admin;
+/*
+metrica          | valore | tipo
+Utenti Totali    | 50     | success
+Corsi Attivi     | 12     | primary  
+Iscrizioni Attive| 145    | info
+Ricavo Mensile   | € 3500 | warning
+*/
+```
+
+#### 2. **Dettagli Corsi Completi**
+
+```sql
+SELECT titolo, chef_nome, iscritti_attivi, posti_disponibili, stato_corso, ricavo_corso
+FROM corsi_dettaglio
+WHERE stato_corso = 'In Corso';
+```
+
+#### 3. **Report Performance Chef**
+
+```sql
+SELECT chef_nome, corsi_totali, tasso_completamento_percentuale, ricavo_totale
+FROM report_chef
+ORDER BY ricavo_totale DESC;
+```
+
+#### 4. **Analisi Temporale**
+
+```sql
+-- Trend mensile iscrizioni
+SELECT periodo, totale_iscrizioni, ricavo_mensile
+FROM analisi_iscrizioni_mensili
+WHERE anno = 2025
+ORDER BY mese DESC;
+```
+
+#### 5. **Notifiche Sistema**
+
+```sql
+-- Notifiche automatiche
+SELECT tipo_notifica, priorita, messaggio
+FROM notifiche_sistema
+WHERE priorita = 'warning';
+```
+
+### 🔧 **Integrazione con l'Applicazione Java**
+
+#### 1. **Aggiornamento IscrizioneDAO**
+
+Il `IscrizioneDAO` può ora utilizzare le nuove funzionalità:
+
+```java
+// Esempio utilizzo funzioni nel DAO
+public int getPostiDisponibili(Integer corsoId) {
+    String sql = "SELECT verifica_posti_disponibili(?)";
+    // ... implementazione
+}
+
+public Map<String, Object> getStatisticheCorso(Integer corsoId) {
+    String sql = "SELECT * FROM calcola_statistiche_corso(?)";
+    // ... implementazione
+}
+```
+
+#### 2. **Utilizzo View per Dashboard**
+
+```java
+// Metodo per dashboard admin
+public List<Map<String, String>> getDashboardMetrics() {
+    String sql = "SELECT * FROM dashboard_admin";
+    // ... implementazione
+}
+
+// Report chef performance
+public List<Map<String, Object>> getReportChef() {
+    String sql = "SELECT * FROM report_chef ORDER BY ricavo_totale DESC";
+    // ... implementazione
+}
+```
+
+### 🛡️ **Sicurezza e Integrità**
+
+#### 1. **Vincoli Implementati**
+- ✅ Email uniche e validate automaticamente
+- ✅ Controllo automatico posti disponibili
+- ✅ Prevenzione iscrizioni duplicate
+- ✅ Stati iscrizione controllati
+
+#### 2. **Tracciabilità**
+- ✅ Log completo di tutte le modifiche
+- ✅ Timestamp automatici su tutte le operazioni
+- ✅ Codici univoci per iscrizioni
+
+#### 3. **Performance**
+- ✅ Indici ottimizzati per tutte le query frequenti
+- ✅ View materializzabili per report pesanti
+- ✅ Funzioni stabili per cache query
+
+### 📝 **Come Applicare gli Aggiornamenti**
+
+#### 1. **Installazione Completa (Database Nuovo)**
+
+```bash
+# 1. Setup base
+psql -d uninafoodlab -f sql/setup_database.sql
+
+# 2. Funzionalità avanzate  
+psql -d uninafoodlab -f sql/advanced_database_features.sql
+```
+
+#### 2. **Aggiornamento Database Esistente**
+
+```bash
+# Solo funzionalità avanzate su DB esistente
+psql -d uninafoodlab -f sql/advanced_database_features.sql
+```
+
+#### 3. **Verifica Installazione**
+
+```sql
+-- Verifica funzioni create
+SELECT proname FROM pg_proc WHERE proname LIKE 'calcola_%' OR proname LIKE 'genera_%' OR proname LIKE 'verifica_%';
+
+-- Verifica view create  
+SELECT viewname FROM pg_views WHERE schemaname = 'public' AND viewname LIKE '%_admin' OR viewname LIKE 'report_%';
+
+-- Verifica trigger attivi
+SELECT tgname FROM pg_trigger WHERE NOT tgisinternal;
+```
+
+---
+
+**⚠️ IMPORTANTE**: Dopo l'installazione delle funzionalità avanzate, aggiornare l'applicazione Java per utilizzare le nuove funzioni e view per migliorare significativamente le performance e la funzionalità del sistema.
+
+---

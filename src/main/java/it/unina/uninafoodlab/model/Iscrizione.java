@@ -16,6 +16,8 @@ public class Iscrizione {
     private LocalDateTime data_iscrizione;
     private String stato; // ATTIVA, COMPLETATA, ANNULLATA
     private String note;
+    private String livelloEsperienza; // PRINCIPIANTE, INTERMEDIO, AVANZATO
+    private String noteParticolari;
 
     // Costruttore vuoto
     public Iscrizione() {}
@@ -23,7 +25,8 @@ public class Iscrizione {
     // Costruttore completo
     public Iscrizione(Integer id, Integer utente_id, Integer corso_id, String nomeUtente,
                       String cognomeUtente, String emailUtente, String titoloCorso,
-                      LocalDateTime data_iscrizione, String stato, String note) {
+                      LocalDateTime data_iscrizione, String stato, String note,
+                      String livelloEsperienza, String noteParticolari) {
         this.id = id;
         this.utente_id = utente_id;
         this.corso_id = corso_id;
@@ -34,6 +37,8 @@ public class Iscrizione {
         this.data_iscrizione = data_iscrizione;
         this.stato = stato;
         this.note = note;
+        this.livelloEsperienza = livelloEsperienza;
+        this.noteParticolari = noteParticolari;
     }
 
     // Costruttore per nuova iscrizione
@@ -74,7 +79,15 @@ public class Iscrizione {
     public void setStato(String stato) { this.stato = stato; }
 
     public String getNote() { return note; }
-    public void setNote(String note) { this.note = note; }    // Metodi di utilità
+    public void setNote(String note) { this.note = note; }
+
+    public String getLivelloEsperienza() { return livelloEsperienza; }
+    public void setLivelloEsperienza(String livelloEsperienza) { this.livelloEsperienza = livelloEsperienza; }
+
+    public String getNoteParticolari() { return noteParticolari; }
+    public void setNoteParticolari(String noteParticolari) { this.noteParticolari = noteParticolari; }
+
+    // Metodi di utilità
     public String getNomeCompletoUtente() {
         return nomeUtente + " " + cognomeUtente;
     }

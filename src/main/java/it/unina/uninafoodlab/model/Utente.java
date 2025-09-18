@@ -29,6 +29,7 @@ public class Utente {
         this.cognome = cognome;
         this.email = email;
         this.telefono = telefono;
+        validateDataNascita(dataNascita);
         this.dataNascita = dataNascita;
         this.livello_esperienza = livello_esperienza;
         this.attivo = attivo;
@@ -42,6 +43,7 @@ public class Utente {
         this.cognome = cognome;
         this.email = email;
         this.telefono = telefono;
+        validateDataNascita(dataNascita);
         this.dataNascita = dataNascita;
         this.livello_esperienza = livello_esperienza;
         this.attivo = true;
@@ -64,7 +66,10 @@ public class Utente {
     public void setTelefono(String telefono) { this.telefono = telefono; }
 
     public LocalDate getDataNascita() { return dataNascita; }
-    public void setDataNascita(LocalDate dataNascita) { this.dataNascita = dataNascita; }
+    public void setDataNascita(LocalDate dataNascita) { 
+        validateDataNascita(dataNascita);
+        this.dataNascita = dataNascita; 
+    }
 
     public String getLivelloEsperienza() { return livello_esperienza; }
     public void setLivelloEsperienza(String livello_esperienza) { this.livello_esperienza = livello_esperienza; }
@@ -80,6 +85,28 @@ public class Utente {
         return nome + " " + cognome;
     }
 
+    /**
+     * Valida la data di nascita per assicurarsi che l'età sia compresa tra 16 e 75 anni
+     * @param dataNascita la data di nascita da validare
+     * @throws IllegalArgumentException se l'età non è valida
+     */
+    private void validateDataNascita(LocalDate dataNascita) {
+        if (dataNascita != null) {
+            int eta = LocalDate.now().getYear() - dataNascita.getYear();
+            // Controllo più preciso considerando mese e giorno
+            if (dataNascita.plusYears(eta).isAfter(LocalDate.now())) {
+                eta--;
+            }
+            
+            if (eta < 16) {
+                throw new IllegalArgumentException("L'età deve essere almeno 16 anni");
+            }
+            if (eta > 75) {
+                throw new IllegalArgumentException("L'età non può superare i 75 anni");
+            }
+        }
+    }
+
     public int getEta() {
         if (dataNascita == null) return 0;
         return LocalDate.now().getYear() - dataNascita.getYear();
@@ -92,6 +119,14 @@ public class Utente {
             case "AVANZATO": return "Avanzato";
             default: return livello_esperienza;
         }
+    }
+
+    /**
+     * Restituisce una rappresentazione testuale dello stato attivo
+     * @return "Si" se attivo, "No" se non attivo
+     */
+    public String getAttivoLabel() {
+        return attivo ? "Si" : "No";
     }
 
     @Override

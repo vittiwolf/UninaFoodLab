@@ -44,6 +44,8 @@ public class TableManager {
                                     TableColumn<Corso, String> colCategoriaCorso,
                                     TableColumn<Corso, String> colFrequenza,
                                     TableColumn<Corso, String> colDataInizio,
+                                    TableColumn<Corso, Integer> colDurataCorso,
+                                    TableColumn<Corso, Integer> colMaxPartecipanti,
                                     TableColumn<Corso, String> colStato) {
         
         // Configurazione colonne
@@ -52,7 +54,11 @@ public class TableManager {
         colCategoriaCorso.setCellValueFactory(cellData -> 
             new javafx.beans.property.SimpleStringProperty(
                 cellData.getValue().getCategoriaNome() != null ? 
-                cellData.getValue().getCategoriaNome() : ""));        colFrequenza.setCellValueFactory(new PropertyValueFactory<>("frequenza"));
+                cellData.getValue().getCategoriaNome() : ""));        
+        colFrequenza.setCellValueFactory(cellData -> 
+            new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue().getFrequenzaDescrizione() != null ? 
+                cellData.getValue().getFrequenzaDescrizione() : "N/A"));
         colDataInizio.setCellValueFactory(cellData -> {
             LocalDate data_inizio = cellData.getValue().getDataInizio();
             if (data_inizio != null) {
@@ -62,6 +68,8 @@ public class TableManager {
                 return new javafx.beans.property.SimpleStringProperty("N/A");
             }
         });
+        colDurataCorso.setCellValueFactory(new PropertyValueFactory<>("durata"));
+        colMaxPartecipanti.setCellValueFactory(new PropertyValueFactory<>("maxPartecipanti"));
         colStato.setCellValueFactory(cellData ->
             new javafx.beans.property.SimpleStringProperty(
                 cellData.getValue().getStato() != null ? cellData.getValue().getStato() : "BOZZA"));
@@ -87,7 +95,8 @@ public class TableManager {
                                        TableColumn<Sessione, String> colDataSessione,
                                        TableColumn<Sessione, String> colTipoSessione,
                                        TableColumn<Sessione, String> colModalita,
-                                       TableColumn<Sessione, Boolean> colCompletata) {
+                                       TableColumn<Sessione, String> colCompletata,
+                                       TableColumn<Sessione, String> colRicetteAssociate) {
           colNumeroSessione.setCellValueFactory(new PropertyValueFactory<>("numeroSessione"));
         colTitoloSessione.setCellValueFactory(new PropertyValueFactory<>("titolo"));
         colDataSessione.setCellValueFactory(cellData -> {
@@ -105,8 +114,13 @@ public class TableManager {
             return new javafx.beans.property.SimpleStringProperty(modalita != null ? modalita : "N/A");
         });
         colCompletata.setCellValueFactory(cellData -> {
-            // Per ora impostiamo tutte le sessioni come non completate
-            return new javafx.beans.property.SimpleBooleanProperty(false);
+            String completataDesc = cellData.getValue().getCompletataDescrizione();
+            return new javafx.beans.property.SimpleStringProperty(completataDesc);
+        });
+        
+        colRicetteAssociate.setCellValueFactory(cellData -> {
+            String ricetteDesc = cellData.getValue().getRicetteAssociate();
+            return new javafx.beans.property.SimpleStringProperty(ricetteDesc);
         });
         
         // SOLUZIONE PER LA SEZIONE GRIGIA: Placeholder personalizzato
@@ -238,6 +252,21 @@ public class TableManager {
     public void caricaSessioniCorso(int corso_id) {
         try {
             List<Sessione> sessioni = service.getSessioniByCorso(corso_id);
+            
+            // Carica le ricette associate per ogni sessione
+            for (Sessione sessione : sessioni) {
+                List<Ricetta> ricette = service.getRicetteSessione(sessione.getId());
+                if (ricette != null && !ricette.isEmpty()) {
+                    String nomiRicette = ricette.stream()
+                        .map(Ricetta::getNome)
+                        .reduce((r1, r2) -> r1 + ", " + r2)
+                        .orElse("");
+                    sessione.setRicetteAssociate(nomiRicette);
+                } else {
+                    sessione.setRicetteAssociate("Nessuna ricetta associata");
+                }
+            }
+            
             listaSessioni.clear();
             listaSessioni.addAll(sessioni);
         } catch (Exception e) {
@@ -292,14 +321,16 @@ public class TableManager {
                                      TableColumn<Utente, String> colCognomeUtente,
                                      TableColumn<Utente, String> colEmailUtente,
                                      TableColumn<Utente, String> colLivelloEsperienza,
-                                     TableColumn<Utente, Boolean> colUtenteAttivo) {
+                                     TableColumn<Utente, String> colUtenteAttivo) {
         
         colIdUtente.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNomeUtente.setCellValueFactory(new PropertyValueFactory<>("nome"));
         colCognomeUtente.setCellValueFactory(new PropertyValueFactory<>("cognome"));
         colEmailUtente.setCellValueFactory(new PropertyValueFactory<>("email"));
-        colLivelloEsperienza.setCellValueFactory(new PropertyValueFactory<>("livello_esperienza"));
-        colUtenteAttivo.setCellValueFactory(new PropertyValueFactory<>("attivo"));
+        colLivelloEsperienza.setCellValueFactory(new PropertyValueFactory<>("livelloEsperienza"));
+        colUtenteAttivo.setCellValueFactory(cellData -> 
+            new javafx.beans.property.SimpleStringProperty(cellData.getValue().getAttivoLabel())
+        );
         
         // SOLUZIONE PER LA SEZIONE GRIGIA: Placeholder personalizzato
         configurePlaceholder(tabellaUtenti, "👥 Nessun utente registrato", "Clicca su 'Nuovo Utente' per registrare i partecipanti");
